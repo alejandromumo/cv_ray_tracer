@@ -17,32 +17,6 @@ var globalAngleYY = 0.0;
 
 var globalTz = 0.0;
 
-// The local transformation parameters
-
-// The translation vector
-
-var tx = 0.0;
-
-var ty = 0.0;
-
-var tz = 0.0;
-
-// The rotation angles in degrees
-
-var angleXX = 0.0;
-
-var angleYY = 0.0;
-
-var angleZZ = 0.0;
-
-// The scaling factors
-
-var sx = 0.5;
-
-var sy = 0.5;
-
-var sz = 0.5;
-
 // NEW - GLOBAL Animation controls
 
 var globalRotationYY_ON = 1;
@@ -70,54 +44,22 @@ var rotationZZ_ON = 1;
 var rotationZZ_DIR = 1;
 
 var rotationZZ_SPEED = 1;
+
+var angleXX = 0;
+var angleYY = 0;
+var angleZZ = 0;
  
 // To allow choosing the way of drawing the model triangles
 
-var primitiveType = null;
+var primitiveType = 2;
  
 // To allow choosing the projection type
 
 var projectionType = 0;
+// Pointer to next object to be drawn
 
-
-// Initial model has just ONE TRIANGLE
-
-var vertices = [
-
-		// FRONTAL TRIANGLE
-		 
-		-0.5, -0.5,  0.5,
-		 
-		 0.5, -0.5,  0.5,
-		 
-		 0.5,  0.5,  0.5,
-];
-
-var normals = [
-
-		// FRONTAL TRIANGLE
-		 
-		 0.0,  0.0,  1.0,
-		 
-		 0.0,  0.0,  1.0,
-		 
-		 0.0,  0.0,  1.0,
-];
-
-// Initial color values just for testing!!
-
-// They are to be computed by the Phong Illumination Model
-
-var colors = [
-
-		 // FRONTAL TRIANGLE
-		 	
-		 1.00,  0.00,  0.00,
-		 
-		 1.00,  0.00,  0.00,
-		 
-		 1.00,  0.00,  0.00,
-];
+var vertices = [];
+var colors = [];
 
 //----------------------------------------------------------------------------
 //
@@ -164,64 +106,12 @@ function initBuffers() {
 
 //----------------------------------------------------------------------------
 
-//  Drawing the model
-
-function drawModel( angleXX, angleYY, angleZZ, 
-					sx, sy, sz,
-					tx, ty, tz,
-					mvMatrix,
-					primitiveType ) {
-    
-	mvMatrix = mult( mvMatrix, translationMatrix( tx, ty, tz ) );
-						 
-	mvMatrix = mult( mvMatrix, rotationZZMatrix( angleZZ ) );
-	
-	mvMatrix = mult( mvMatrix, rotationYYMatrix( angleYY ) );
-	
-	mvMatrix = mult( mvMatrix, rotationXXMatrix( angleXX ) );
-	
-	mvMatrix = mult( mvMatrix, scalingMatrix( sx, sy, sz ) );
-						 
-	// Passing the Model View Matrix to apply the current transformation
-	
-	var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-	
-	gl.uniformMatrix4fv(mvUniform, false, new Float32Array(flatten(mvMatrix)));
-	
-	// Drawing the contents of the vertex buffer
-	
-	// primitiveType allows drawing as filled triangles / wireframe / vertices
-	
-	if( primitiveType == gl.LINE_LOOP ) {
-		
-		// To simulate wireframe drawing!
-		
-		// Taking the vertices 3 by 3 and drawing a LINE_LOOP
-		
-		var i;
-		
-		for( i = 0; i < triangleVertexPositionBuffer.numItems / 3; i++ ) {
-		
-			gl.drawArrays( primitiveType, 3 * i, 3 ); 
-		}
-	}	
-	else {
-				
-		gl.drawArrays(primitiveType, 0, triangleVertexPositionBuffer.numItems); 
-		
-	}	
-}
-
-//----------------------------------------------------------------------------
-
 //  Drawing the 3D scene
 
 function drawScene() {
 	
 	var pMatrix;
-	
-	var mvMatrix = mat4();
-	
+
 	// Clearing the frame-buffer and the depth-buffer
 	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -248,20 +138,37 @@ function drawScene() {
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
 	
 	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
-	
-	mvMatrix = translationMatrix( 0, 0, globalTz );
-	
-	// Instantianting the current model
-		
-	drawModel( angleXX, angleYY, angleZZ, 
-	           sx, sy, sz,
-	           tx, ty, tz,
-	           mvMatrix,
-	           primitiveType );
 
-	// TODO
-	// Draw Cube
-	// Draw Sphere
+	// Create a cube model and update index starting at 0
+	var cube_model = Model.getCubeModel();
+	var cube_gl_model = new GLModel(cube_model,0);
+
+	// Create a pyramid model and update index starting at the end of the cube model
+	var pyramid_model = Model.getPyramidModel();
+	var pyramid_gl_model = new GLModel(pyramid_model,cube_gl_model.size);
+
+	// Concatenate both models vertex positions and colors
+	// vertices = cube_model.positionArray;
+	// colors = cube_model.colorArray;
+
+	vertices = cube_model.positionArray.concat(pyramid_model.positionArray);
+	colors = cube_model.colorArray.concat(pyramid_model.colorArray);
+	initBuffers();	
+	
+	// Create a cube object and draw it.
+	var cube_object1 = new myObject(cube_gl_model,
+									0,0,0,
+									0.5,0.5,0.5,
+									angleXX,angleYY,angleZZ);
+	cube_object1.drawObject(primitiveType);
+
+	var pyramid_object1 = new myObject( pyramid_gl_model,
+										0.5,0,0,
+										1,1,1,
+										angleXX,0,angleZZ);
+	pyramid_object1.drawObject(primitiveType);
+
+	// initBuffers();
 }
 
 // Animation --- Updating transformation parameters
@@ -312,11 +219,10 @@ function animate() {
 function tick() {
 
 	requestAnimFrame(tick);
-	// animate(); Não queremos animar os objetos por enquanto
+	animate();//  Não queremos animar os objetos por enquanto
 	drawScene();
 }
 
-//----------------------------------------------------------------------------
 //
 //  User Interaction
 //
@@ -416,6 +322,16 @@ function setEventListeners(){
 				break;
 		}
 	}); 
+
+	var cube_button = document.getElementById("add-cube");
+	cube_button.addEventListener("click",function(){
+		console.log("Adding Cube");
+	});
+
+	var sphere_button = document.getElementById("add-sphere");
+	sphere_button.addEventListener("click",function(){
+		console.log("Adding Sphere");
+	});
 }
 
 //----------------------------------------------------------------------------

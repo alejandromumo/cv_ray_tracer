@@ -77,13 +77,17 @@ Passing the Model-View Matrix and the Projection Matrix.
 
 <!-- Processing triangle mesh models -->
 
-<script type="text/javascript" src="models.js"></script>
+<script type="text/javascript" src="models-operations.js"></script>
 
 <!-- WebGL code -->
 
 <script type="text/javascript" src="initShaders.js"></script>
-
+<script type="text/javascript" src="model.js"></script>
+<script type="text/javascript" src="scene.js"></script>
+<script type="text/javascript" src="myobject.js"></script>
+<script type="text/javascript" src="glmodel.js"></script>
 <script type="text/javascript" src="ray_tracer.js"></script>
+
 
 
 
@@ -111,6 +115,11 @@ Passing the Model-View Matrix and the Projection Matrix.
 			<option value="1">Wireframe</option>
 			<option value="2">Vertices</option>
         </select>
+
+        <p>
+        	<button id = "add-cube"> Add Cube</button>
+        	<button id = "add-sphere"> Add Sphere</button>
+        </p>
 				
 	</div>
 
