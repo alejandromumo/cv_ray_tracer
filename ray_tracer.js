@@ -17,7 +17,7 @@ var globalAngleYY = 0.0;
 
 var globalTz = 0.0;
 
-// NEW - GLOBAL Animation controls
+// GLOBAL Animation controls
 
 var globalRotationYY_ON = 1;
 
@@ -25,7 +25,7 @@ var globalRotationYY_DIR = 1;
 
 var globalRotationYY_SPEED = 1;
 
-// NEW - Local Animation controls
+// Local Animation controls
 
 var rotationXX_ON = 1;
 
@@ -55,121 +55,16 @@ var primitiveType = 2;
  
 // To allow choosing the projection type
 
-var projectionType = 0;
-// Pointer to next object to be drawn
+var projectionType = 1;
 
-var vertices = [];
-var colors = [];
+var num_cubes = 0;
+var num_pyramids = 0;
+
 
 //----------------------------------------------------------------------------
 //
 // The WebGL code
 //
-
-//----------------------------------------------------------------------------
-//
-//  Rendering
-//
-
-// Handling the Vertex and the Color Buffers
-
-function initBuffers() {	
-	
-	// Coordinates
-		
-	triangleVertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	triangleVertexPositionBuffer.itemSize = 3;
-	triangleVertexPositionBuffer.numItems = vertices.length / 3;			
-
-	// Associating to the vertex shader
-	
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 
-			triangleVertexPositionBuffer.itemSize, 
-			gl.FLOAT, false, 0, 0);
-	
-	// Colors
-		
-	triangleVertexColorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-	triangleVertexColorBuffer.itemSize = 3;
-	triangleVertexColorBuffer.numItems = colors.length / 3;			
-
-	// Associating to the vertex shader
-	
-	gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 
-			triangleVertexColorBuffer.itemSize, 
-			gl.FLOAT, false, 0, 0);
-}
-
-//----------------------------------------------------------------------------
-
-//  Drawing the 3D scene
-
-function drawScene() {
-	
-	var pMatrix;
-
-	// Clearing the frame-buffer and the depth-buffer
-	
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
-	// Computing the Projection Matrix
-	
-	if( projectionType == 0 ) {
-		
-		pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
-		
-		globalTz = 0;
-	}
-	else {	
-		
-		pMatrix = perspective( 45, 1, 0.05, 15 );
-		
-		globalTz = -2.5;
-	}
-	
-	// Passing the Projection Matrix to apply the current projection
-	
-	var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-	
-	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
-	
-	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
-
-	// Create a cube model and update index starting at 0
-	var cube_model = Model.getCubeModel();
-	var cube_gl_model = new GLModel(cube_model,0);
-
-	// Create a pyramid model and update index starting at the end of the cube model
-	var pyramid_model = Model.getPyramidModel();
-	var pyramid_gl_model = new GLModel(pyramid_model,cube_gl_model.size);
-
-	// Concatenate both models vertex positions and colors
-	// vertices = cube_model.positionArray;
-	// colors = cube_model.colorArray;
-
-	vertices = cube_model.positionArray.concat(pyramid_model.positionArray);
-	colors = cube_model.colorArray.concat(pyramid_model.colorArray);
-	initBuffers();	
-	
-	// Create a cube object and draw it.
-	var cube_object1 = new myObject(cube_gl_model,
-									0,0,0,
-									0.5,0.5,0.5,
-									angleXX,angleYY,angleZZ);
-	cube_object1.drawObject(primitiveType);
-
-	var pyramid_object1 = new myObject( pyramid_gl_model,
-										0.5,0,0,
-										1,1,1,
-										angleXX,0,angleZZ);
-	pyramid_object1.drawObject(primitiveType);
-
-	// initBuffers();
-}
 
 // Animation --- Updating transformation parameters
 
@@ -219,8 +114,32 @@ function animate() {
 function tick() {
 
 	requestAnimFrame(tick);
-	animate();//  Não queremos animar os objetos por enquanto
-	drawScene();
+	animate();
+
+	var scene = new Scene("scene1");
+	var cube_model = Model.getCubeModel();
+	var pyramid_model = Model.getPyramidModel();
+	var floor_model = Model.getFloorModel();
+	var bck_model = Model.getBackgroundModel();
+	scene.addModel(cube_model);
+	scene.addModel(pyramid_model);
+	scene.addModel(floor_model);
+	scene.addModel(bck_model);
+
+	var cube = scene.addObject(cube_model.gl_model);
+	cube.rotate(angleXX, 0, 0);
+	cube.translate(0, 0.4, 0);
+
+
+	var pyramid = scene.addObject(pyramid_model.gl_model);
+	pyramid.rotate(0, angleYY, angleZZ);
+	pyramid.translate(0.4, -0.5, 0);
+
+	var floor = scene.addObject(floor_model.gl_model);
+
+	var background = scene.addObject(bck_model.gl_model);
+
+	scene.drawScene(projectionType, primitiveType);
 }
 
 //
@@ -325,13 +244,17 @@ function setEventListeners(){
 
 	var cube_button = document.getElementById("add-cube");
 	cube_button.addEventListener("click",function(){
-		console.log("Adding Cube");
+		num_cubes += 1;
 	});
 
-	var sphere_button = document.getElementById("add-sphere");
+	var sphere_button = document.getElementById("add-pyramid");
 	sphere_button.addEventListener("click",function(){
-		console.log("Adding Sphere");
+		num_pyramids += 1;
 	});
+}
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
 }
 
 //----------------------------------------------------------------------------
@@ -390,9 +313,7 @@ function runWebGL() {
 	shaderProgram = initShaders( gl );
 	
 	setEventListeners();
-	
-	initBuffers();
-	
+
 	tick();		  
 
 	outputInfos();

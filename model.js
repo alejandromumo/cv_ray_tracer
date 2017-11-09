@@ -9,7 +9,7 @@ class Model{
 	
 	static getCubeModel()
 	{
-		var cube = new Model("cubo");
+		var cube = new Model("cube");
 		cube.positionArray = [
 		// FRONT FACE
 		-0.25, -0.25,  0.25,
@@ -199,7 +199,7 @@ class Model{
 
 	static getPyramidModel()
 	{
-		var pyramid = new Model("piramide");
+		var pyramid = new Model("pyramid");
 		pyramid.positionArray = [
 			// Base
 			0.00 , 0.00 , 0.25, //v0
@@ -284,6 +284,74 @@ class Model{
 			0.00, 1.00, 1.00,
 			];
 			return pyramid;
+	}
+
+	static getFloorModel()
+	{
+		var floor = new Model("floor");
+		floor.positionArray = [
+		 1.00 , 0.00, 1.00,
+		 
+		-1.00 , 0.00, 1.00,
+
+		-1.00 , 0.00, -1.00,
+
+
+		 1.00, 0.00,  1.00,
+		
+		-1.00, 0.00, -1.00,
+
+
+		 1.00, 0.00, -1.00 
+		];
+
+		floor.colorArray = [
+		0.25, 0.20, 0,
+
+		0.25, 0.20, 0,
+
+		0.25, 0.20, 0,
+
+		0.25, 0.20, 0,
+
+		0.25, 0.20, 0,
+
+		0.25, 0.20, 0
+		];
+		return floor;
+	}
+
+	static getBackgroundModel()
+	{
+		var background = new Model("background");
+		background.positionArray = [
+		1.00 , 0.00, -1.00,
+
+		1.00 , 1.00, -1.00,
+
+		-1.00 , 1.00, -1.00,
+
+		 1.00, 0.00, -1.00,
+
+		-1.00, 1.00, -1.00,
+
+		-1.00, 0.00, -1.00 
+		];
+
+		background.colorArray = [
+		0.30, 0.30, 0.30,
+
+		0.30, 0.30, 0.30,
+
+		0.30, 0.30, 0.30,
+
+		0.30, 0.30, 0.30,
+
+		0.30, 0.30, 0.30,
+
+		0.30, 0.30, 0.30,
+		];
+		return background;
 	}
 
 }
