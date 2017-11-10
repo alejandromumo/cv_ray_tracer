@@ -4,6 +4,7 @@ class Model{
 		this.name = name;
 		this.positionArray = [];
 		this.colorArray = [];
+		this.normalsArray = [];
 		this.gl_model = null;
 	}
 	
@@ -194,6 +195,8 @@ class Model{
 		 
 		 0.25,  0.00,  0.75,			 			 
 		];
+
+		computeVertexNormals(cube.positionArray, cube.normalsArray);
 		return cube;
 	}
 
@@ -283,6 +286,7 @@ class Model{
 
 			0.00, 1.00, 1.00,
 			];
+			computeVertexNormals(pyramid.positionArray, pyramid.normalsArray)
 			return pyramid;
 	}
 
@@ -318,6 +322,7 @@ class Model{
 
 		0.25, 0.20, 0
 		];
+		computeVertexNormals(floor.positionArray, floor.normalsArray)
 		return floor;
 	}
 
@@ -351,7 +356,22 @@ class Model{
 
 		0.30, 0.30, 0.30,
 		];
+		computeVertexNormals(background.positionArray, background.normalsArray)
 		return background;
 	}
 
+	static getSphereModel()
+	{
+		var sphere = new Model("sphere");
+		sphere.positionArray = []; 	// TODO
+		sphere.colorArray = []; 	// TODO
+	}
+
+	// TODO Get Model from OBJ Files
+
+	static getFromFile(file)
+	{	
+		var file_model = new Model(file.name);
+		return file_model;
+	}
 }

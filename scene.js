@@ -72,32 +72,36 @@ class Scene{
 
 	initBuffers() {	
 	
-	// Coordinates
-		
-	triangleVertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_vertices), gl.STATIC_DRAW);
-	triangleVertexPositionBuffer.itemSize = 3;
-	triangleVertexPositionBuffer.numItems = this.model_vertices.length / 3;			
+		// Coordinates	
+		triangleVertexPositionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_vertices), gl.STATIC_DRAW);
+		triangleVertexPositionBuffer.itemSize = 3;
+		triangleVertexPositionBuffer.numItems = this.model_vertices.length / 3;			
 
-	// Associating to the vertex shader
-	
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 
-			triangleVertexPositionBuffer.itemSize, 
-			gl.FLOAT, false, 0, 0);
-	
-	// Colors
+		// Associating to the vertex shader
 		
-	triangleVertexColorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_colors), gl.STATIC_DRAW);
-	triangleVertexColorBuffer.itemSize = 3;
-	triangleVertexColorBuffer.numItems = this.model_colors.length / 3;			
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 
+				triangleVertexPositionBuffer.itemSize, 
+				gl.FLOAT, false, 0, 0);
+		
+		// Colors
+			
+		triangleVertexColorBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_colors), gl.STATIC_DRAW);
+		triangleVertexColorBuffer.itemSize = 3;
+		triangleVertexColorBuffer.numItems = this.model_colors.length / 3;			
 
-	// Associating to the vertex shader
-	
-	gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 
-			triangleVertexColorBuffer.itemSize, 
-			gl.FLOAT, false, 0, 0);
-}
+		// Associating to the vertex shader
+		
+		gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 
+				triangleVertexColorBuffer.itemSize, 
+				gl.FLOAT, false, 0, 0);
+	}
+
+	computeIllumination()
+	{
+		// TODO
+	}
 }
