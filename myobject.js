@@ -47,6 +47,7 @@ class myObject{
 
 	drawObject(primitiveType)
 	{
+
 		this.computeMvMatrix();
 		if( primitiveType == gl.LINE_LOOP ) {
 			
@@ -74,6 +75,13 @@ class myObject{
 		this.angleXX = rx;
 		this.angleYY = ry;
 		this.angleZZ = rz;
+	}
+
+    deltarotate(rx, ry, rz )
+	{
+		this.angleXX += rx;
+		this.angleYY += ry;
+		this.angleZZ += rz;
 	}
 
 	translate(tx, ty, tz)

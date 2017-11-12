@@ -1,86 +1,58 @@
 <!DOCTYPE html>
 
 <html>
-
 <head>
-	
 <title>Ray Tracer</title>
-
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 <!--
-
 The simple vertex and fragment shaders.
-
 Using a vertex coordinate buffer and a vertex colour buffer.
-
-Passing the Model-View Matrix and the Projection Matrix. 
-
+Passing the Model-View Matrix and the Projection Matrix.
 -->
 
 <script id="shader-vs" type="x-shader/x-vertex">
-	
     attribute vec3 aVertexPosition;
-
     attribute vec3 aVertexColor;
-    
     uniform mat4 uMVMatrix;
-
     uniform mat4 uPMatrix;
-
     varying vec4 vertexColor;
-    
+
     void main(void) {
-		
-		// To allow seeing the points drawn
-		
-		gl_PointSize = 5.0;
-		
-		// Just converting the (x,y,z) vertices to Homogeneous Coord.
-		
-		// And multiplying by the Projection and the Model-View matrix
-		
+        // To allow seeing the points drawn
+        gl_PointSize = 5.0;
+        // Just converting the (x,y,z) vertices to Homogeneous Coord.
+        // And multiplying by the Projection and the Model-View matrix
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        
         // Converting the RGB color value to RGBA
-        
         vertexColor = vec4(aVertexColor, 1.0);
     }
 </script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
 
-	precision mediump float;
-	
-	varying vec4 vertexColor;
-	
-	void main(void) {
-		
-		// Using the passed vertex color
-		
-		gl_FragColor = vertexColor;
-	}
+    precision mediump float;
+    varying vec4 vertexColor;
+    void main(void) {
+        // Using the passed vertex color
+        gl_FragColor = vertexColor;
+    }
 
 </script>
 
 <!-- The JS files -->
-
 <!-- Some useful functions for browser compatibility -->
-
 <script type="text/javascript" src="webgl-utils.js"></script>
 
 <!-- Handling vectors and matrices -->
-
 <script type="text/javascript" src="math.js"></script>
 <script type="text/javascript" src="vector.js"></script>
 <script type="text/javascript" src="matrix.js"></script>
 
 <!-- Processing triangle mesh models -->
-
 <script type="text/javascript" src="models-operations.js"></script>
 
 <!-- WebGL code -->
-
 <script type="text/javascript" src="initShaders.js"></script>
 <script type="text/javascript" src="model.js"></script>
 <script type="text/javascript" src="scene.js"></script>
@@ -88,41 +60,33 @@ Passing the Model-View Matrix and the Projection Matrix.
 <script type="text/javascript" src="glmodel.js"></script>
 <script type="text/javascript" src="ray_tracer.js"></script>
 
-
-
-
-
 </head>
 
 <body onload="runWebGL();">
+    <div style="text-align: center">
+        <p>Ray Tracing</p>
 
-	<div style="text-align: center">
-		
-		<p>Ray Tracing</p>
-		
-		<canvas id="my-canvas" style="border:1px solid #000000;" width="350" height="350"></canvas>
+        <canvas id="my-canvas" style="border:1px solid #000000;" width="350" height="350"></canvas>
 
         <p>Read a 3D model from a text file and add it to scene:
-		
-		<input type="file" id="file" name="file">
-		
-		</p>
+        <input type="file" id="file" name="file">
+        </p>
+        <p>Read a 3D model from a <b>OBJ file</b>:
+        <input type="file" id="obj-file" name="file">
+        </p>
 
-		<p>Choose the <b>rendering mode</b>:
-		
+        <p>Choose the <b>rendering mode</b>:
         <select id="rendering-mode-selection">
-			<option value="0">Filled Triangles</option>
-			<option value="1">Wireframe</option>
-			<option value="2">Vertices</option>
+            <option value="0">Filled Triangles</option>
+            <option value="1">Wireframe</option>
+            <option value="2">Vertices</option>
         </select>
 
         <p>
-        	<button id = "add-cube"> Add Cube</button>
-        	<button id = "add-pyramid"> Add Pyramid</button>
+            <button id = "add-cube"> Add Cube</button>
+            <button id = "add-pyramid"> Add Pyramid</button>
         </p>
-				
-	</div>
 
+    </div>
 </body>
-
 </html>
