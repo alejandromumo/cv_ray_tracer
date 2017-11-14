@@ -1,8 +1,10 @@
 class myObject{
-    constructor(glmodel)
+    constructor(glmodel, gl, shaderProgram)
     {
         this.glmodel = glmodel;
         this.u_mvMatrix = mat4();
+        this.gl = gl;
+        this.shaderProgram = shaderProgram;
 
         // this.localMatrix = mat4(); TODO
         // this.worldMatrix = mat4(); TODO
@@ -41,9 +43,9 @@ class myObject{
         this.u_mvMatrix = mult( this.u_mvMatrix, 
                               scalingMatrix( this.sx, this.sy, this.sz ) );
 
-        var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        var mvUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
         
-        gl.uniformMatrix4fv(mvUniform, false,
+        this.gl.uniformMatrix4fv(mvUniform, false,
                              new Float32Array(flatten(this.u_mvMatrix)));
     }
 
@@ -51,16 +53,16 @@ class myObject{
     {
 
         this.computeMvMatrix();
-        if( primitiveType == gl.LINE_LOOP ) {
+        if( primitiveType == this.gl.LINE_LOOP ) {
             
             var i;
             for( i = this.glmodel.start; i < (this.glmodel.size / 3); i++ ) {
             
-                gl.drawArrays( primitiveType, 3 * i, 3 ); 
+                this.gl.drawArrays( primitiveType, 3 * i, 3 ); 
             }
         }   
         else {
-            gl.drawArrays(primitiveType, this.glmodel.start,
+            this.gl.drawArrays(primitiveType, this.glmodel.start,
                           this.glmodel.size);       
         }   
     }
@@ -108,19 +110,19 @@ class myObject{
         
         var specularProduct = mult( this.material.kSpec, lightSource.intensity );
 
-        gl.uniform3fv( gl.getUniformLocation(shaderProgram, "ambientProduct"), 
+        this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "ambientProduct"), 
             flatten(ambientProduct) );
         
-        gl.uniform3fv( gl.getUniformLocation(shaderProgram, "diffuseProduct"),
+        this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "diffuseProduct"),
             flatten(diffuseProduct) );
         
-        gl.uniform3fv( gl.getUniformLocation(shaderProgram, "specularProduct"),
+        this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "specularProduct"),
             flatten(specularProduct) );
 
-        gl.uniform1f( gl.getUniformLocation(shaderProgram, "shininess"), 
+        this.gl.uniform1f( this.gl.getUniformLocation(this.shaderProgram, "shininess"), 
             this.material.nPhong );
 
-        gl.uniform4fv( gl.getUniformLocation(shaderProgram, "lightPosition"),
+        this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "lightPosition"),
             flatten(lightSource.position) );
     }
 }

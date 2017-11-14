@@ -1,8 +1,11 @@
 //----------------------------------------------------------------------------
 // Global Variables
 
-var gl = null; // WebGL context
-var scene = null;
+var gll = null; // WebGL context
+var glr = null;
+
+var scenel = null;
+var scener = null;
 
 var shaderProgram = null;
 var triangleVertexPositionBuffer = null;
@@ -14,25 +17,10 @@ var globalTx = 0.0;
 var globalTy = -1;
 var globalTz = 0.0;
 
-
 // GLOBAL Animation controls
 var globalRotationYY_ON = 1;
 var globalRotationYY_DIR = 1;
 var globalRotationYY_SPEED = 1;
-
-// Local Animation controls
-var rotationXX_ON = 1;
-var rotationXX_DIR = 1;
-var rotationXX_SPEED = 1;
-var rotationYY_ON = 1;
-var rotationYY_DIR = 1;
-var rotationYY_SPEED = 1;
-var rotationZZ_ON = 1;
-var rotationZZ_DIR = 1;
-var rotationZZ_SPEED = 1;
-var angleXX = 0;
-var angleYY = 0;
-var angleZZ = 0;
 
 // To allow choosing the way of drawing the model triangles
 var primitiveType = 2;
@@ -49,7 +37,7 @@ var projectionType = 1; // TODO ortogonal não funciona muito bem
 
 var lastTime = 0;
 
-function animate() {
+function animate( scene ) {
 
     var timeNow = new Date().getTime();
     if( lastTime != 0 ) {
@@ -73,9 +61,11 @@ function animate() {
 function tick() {
     requestAnimFrame(tick);
 
-    animate();
+    animate( scenel );
+    animate( scener );
 
-    scene.drawScene(projectionType, primitiveType);
+    scenel.drawScene(projectionType, primitiveType);
+    scener.drawScene(projectionType, primitiveType);
 }
 
 //
@@ -211,10 +201,9 @@ function getRandomArbitrary(min, max) {
 
 function initWebGL( canvas ) {
     try {
-
         // Create the WebGL context
         // Some browsers still need "experimental-webgl"
-        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
         // DEFAULT: The viewport occupies the whole canvas
         // DEFAULT: The viewport background color is WHITE
@@ -232,7 +221,7 @@ function initWebGL( canvas ) {
 
         // Enable DEPTH-TEST
         gl.enable( gl.DEPTH_TEST );
-
+        return gl;
     } catch (e) {
     }
     if (!gl) {
@@ -241,9 +230,9 @@ function initWebGL( canvas ) {
 }
 
 
-function initScene( name ){
+function initScene( name , gl , shaderProgram){
 
-    scene = new Scene(name);
+    var scene = new Scene(name, gl, shaderProgram);
 
     var cube_model = Model.getCubeModel();
     var pyramid_model = Model.getPyramidModel();
@@ -288,19 +277,27 @@ function initScene( name ){
     light_source.switchOn();
     // light_source.switchRotYYOn();
     scene.addLightSource(light_source);
+    return scene;
 }
 
 //----------------------------------------------------------------------------
 
 function runWebGL() {
-    var canvas = document.getElementById("my-canvas");
-    initWebGL( canvas );
+    var canvasl = document.getElementById("canvasl");
+    var canvasr = document.getElementById("canvasr");
 
-    shaderProgram = initShaders( gl );
+    gll = initWebGL( canvasl );
+    glr =initWebGL( canvasr );
+
+    shaderPrograml = initShaders( gll );
+    shaderProgramr = initShaders( glr );
 
     setEventListeners();
 
-    initScene();
+    scenel = initScene("scene1", gll , shaderPrograml);
+    scener = initScene("scene2", glr , shaderProgramr);
+
+    scenel.light_sources[0].switchOff();
     tick();
 
     outputInfos();

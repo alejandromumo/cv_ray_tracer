@@ -18,11 +18,11 @@ Passing the Model-View Matrix and the Projection Matrix.
     varying vec4 vertexColor;
 
     // Lightsource
-        
+
     attribute vec3 vNormal;
     uniform vec4 lightPosition;
     uniform vec4 viewerPosition;
-    
+
     // The light intensity multiplied by the material reflection coefficients
 
     uniform vec3 ambientProduct;
@@ -38,77 +38,77 @@ Passing the Model-View Matrix and the Projection Matrix.
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
         // Converting the RGB color value to RGBA
         vec3 pos = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;
-    
+
         // vector from vertex position to light source
-    
+
         vec3 L;
-        
+
         // check for directional light
-    
+
         if(lightPosition.w == 0.0) // Directional
-        
+
             L = normalize( lightPosition.xyz );
-        
+
         else  // Omni
-        
+
             L = normalize( lightPosition.xyz - pos );
 
         // Vector from the vertex position to the eye
-        
+
         vec3 E;
-        
+
         // The viewer is at the origin or at an indefinite distance
         // on the ZZ axis
-        
-        if(viewerPosition.w == 1.0) 
-        
+
+        if(viewerPosition.w == 1.0)
+
             // At the origin
-            
+
             E = -normalize( pos );
-        
-        else 
-        
+
+        else
+
             // On the ZZ axis
-            
+
             E = vec3(0,0,1);
-            
+
         // Halfway vector
-    
+
         vec3 H = normalize( L + E );
 
         // Transform vertex normal into eye coordinates
-    
+
         vec4 N = normalize( uMVMatrix * vec4(vNormal, 0.0));
 
         // Compute terms in the illumination equation
-        
+
         // Ambient component is constant
-        
+
         vec4 ambient = vec4( ambientProduct, 1.0 );
-        
-        // Diffuse component 
-        
-        float dotProductLN = L[0] * N[0] + L[1] * N[1] + L[2] * N[2]; 
-        
+
+        // Diffuse component
+
+        float dotProductLN = L[0] * N[0] + L[1] * N[1] + L[2] * N[2];
+
         float cosNL = max( dotProductLN, 0.0 );
-    
+
         vec4  diffuse = vec4( diffuseProduct * cosNL, 1.0 );
-        
+
         // Specular component
 
-        float dotProductNH = N[0] * H[0] + N[1] * H[1] + N[2] * H[2]; 
-        
+        float dotProductNH = N[0] * H[0] + N[1] * H[1] + N[2] * H[2];
+
         float cosNH = pow( max( dotProductNH, 0.0 ), shininess );
-    
+
         vec4  specular = vec4( specularProduct * cosNH, 1.0 );
-    
+
         if( dotProductLN < 0.0 ) {
-    
+
             specular = vec4(0.0, 0.0, 0.0, 1.0);
-        } 
+        }
 
         // Adding the 3 components
-        
+
         vertexColor = ambient + diffuse + specular;
     }
 
@@ -155,7 +155,8 @@ Passing the Model-View Matrix and the Projection Matrix.
     <div style="text-align: center">
         <p>Ray Tracing</p>
 
-        <canvas id="my-canvas" style="border:1px solid #000000;" width="350" height="350"></canvas>
+        <canvas id="canvasl" style="border:1px solid #000000;" width="350" height="350"></canvas>
+        <canvas id="canvasr" style="border:1px solid #000000;" width="350" height="350"></canvas>
 
         <p>Read a 3D model from a text file and add it to scene:
         <input type="file" id="file" name="file">

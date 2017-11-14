@@ -1,8 +1,10 @@
 class Scene{
 
-    constructor(name)
+    constructor(name, gl, shaderProgram)
     {
         this.name = name;
+        this.gl = gl;
+        this.shaderProgram = shaderProgram;
 
         this.objects = [];
         this.light_sources = [];
@@ -19,7 +21,7 @@ class Scene{
 
     drawScene(projectionType, primitiveType)
     {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // Computing the Projection Matrix
         this.computeProjectionMatrix(projectionType);
@@ -48,15 +50,15 @@ class Scene{
             globalTz = -4.5;
         }
 
-        var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
 
-        gl.uniformMatrix4fv(pUniform, false,
+        this.gl.uniformMatrix4fv(pUniform, false,
                              new Float32Array(flatten(this.pMatrix)));
     }
 
     computeViewerPosition()
     {
-		gl.uniform4fv( gl.getUniformLocation(shaderProgram, "viewerPosition"),
+		this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "viewerPosition"),
 	        flatten(this.camera.cameraPosition) );
     }
 
@@ -75,7 +77,7 @@ class Scene{
 
     addObject(gl_model)
     {
-        var newObject = new myObject(gl_model);
+        var newObject = new myObject(gl_model, this.gl, this.shaderProgram);
         this.objects.push(newObject);
         return newObject;
     }
@@ -93,28 +95,27 @@ class Scene{
     initBuffers() {
 
         // Coordinates
-        triangleVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_vertices), gl.STATIC_DRAW);
+        triangleVertexPositionBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.model_vertices), this.gl.STATIC_DRAW);
         triangleVertexPositionBuffer.itemSize = 3;
         triangleVertexPositionBuffer.numItems = this.model_vertices.length / 3;
 
         // Associating to the vertex shader
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute,
                 triangleVertexPositionBuffer.itemSize,
-                gl.FLOAT, false, 0, 0);
+                this.gl.FLOAT, false, 0, 0);
 
         // Vertex Normal Vectors
-        triangleVertexNormalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals), gl.STATIC_DRAW);
+        triangleVertexNormalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, triangleVertexNormalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.normals), this.gl.STATIC_DRAW);
         triangleVertexNormalBuffer.itemSize = 3;
-        triangleVertexNormalBuffer.numItems = this.normals.length / 3;           
+        triangleVertexNormalBuffer.numItems = this.normals.length / 3;
 
         // Associating to the vertex shader
-        
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 
-                triangleVertexNormalBuffer.itemSize, 
-                gl.FLOAT, false, 0, 0); 
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute,
+                triangleVertexNormalBuffer.itemSize,
+                this.gl.FLOAT, false, 0, 0);
     }
 }
