@@ -97,6 +97,37 @@ function mat4()
     return m;
 }
 
+function array_to_mat4(a)
+{
+    var matrix4 = mat4();
+    var idx = 0;
+    for (var i = 0; i < a.length; i++) {
+        idx = i % 4;
+        for (var j = 0; j < 4; j++) {
+            matrix4[idx][j] = a[i];
+        }
+    }
+
+    return matrix4;
+}
+
+function lookAt(cameraPosition, target, up)
+{
+    var zAxis = subtract(cameraPosition, target);
+    normalize(zAxis);
+    var xAxis = vectorProduct(up, zAxis);
+    var yAxis = vectorProduct(zAxis, xAxis);
+ 
+    var array =  [ xAxis[0], xAxis[1], xAxis[2], 0,
+    yAxis[0], yAxis[1], yAxis[2], 0,
+    zAxis[0], zAxis[1], zAxis[2], 0,
+    cameraPosition[0],cameraPosition[1],cameraPosition[2],1];
+
+    var matrix4 = array_to_mat4(array);
+    console.log(matrix4);
+    return matrix4;
+}
+
 //----------------------------------------------------------------------------
 
 function transpose( m )

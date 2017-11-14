@@ -6,11 +6,14 @@ var scene = null;
 
 var shaderProgram = null;
 var triangleVertexPositionBuffer = null;
-var triangleVertexColorBuffer = null;
+var triangleVertexNormalBuffer = null;
 
 // The GLOBAL transformation parameters
 var globalAngleYY = 0.0;
+var globalTx = 0.0;
+var globalTy = -1;
 var globalTz = 0.0;
+
 
 // GLOBAL Animation controls
 var globalRotationYY_ON = 1;
@@ -35,14 +38,7 @@ var angleZZ = 0;
 var primitiveType = 2;
 
 // To allow choosing the projection type
-var projectionType = 1;
-
-
-
-
-
-var num_cubes = 0;
-var num_pyramids = 0;
+var projectionType = 1; // TODO ortogonal não funciona muito bem
 
 
 //----------------------------------------------------------------------------
@@ -61,9 +57,9 @@ function animate() {
         // do stuff to animate scene
         // namely rotate objects and stuff
 
-        scene.objects[0].deltarotate(10,0,0);
-        scene.objects[1].deltarotate(20,10,3);
-
+        scene.objects[0].deltarotate(1,0,0);
+        scene.objects[1].deltarotate(2,1,0.3);
+        // scene.objects[3].deltarotate(0,1,0);
     }
 
     lastTime = timeNow;
@@ -97,6 +93,7 @@ function setEventListeners(){
     document.getElementById("obj-file").onchange = function(){
         var file = this.files[0];
         var obj_model = Model.getFromFile(file)
+        // console.log(obj_model);
    }
 
 
@@ -159,12 +156,49 @@ function setEventListeners(){
 
     var cube_button = document.getElementById("add-cube");
     cube_button.addEventListener("click",function(){
-        num_cubes += 1;
+        scene.camera.deltaRotate(0,15,0);
     });
 
     var sphere_button = document.getElementById("add-pyramid");
     sphere_button.addEventListener("click",function(){
-        num_pyramids += 1;
+        scene.camera.deltaRotate(0,-15,0);
+    });
+
+
+    document.addEventListener('keydown', function(event){
+        switch(event.keyCode){
+            case 37: // rotate left LEFTKEY
+                scene.camera.deltaRotate(0,-10,0);
+                break;
+            case 38: // rotate up UPKEY
+                scene.camera.deltaRotate(10,0,0);
+                break;
+            case 39: // rotate right RIGHTKEY
+                scene.camera.deltaRotate(0,10,0);
+                break;
+            case 40: // rotate down DOWNKEY
+                scene.camera.deltaRotate(-10,0,0);
+                break;
+            case 87: // move front W
+                scene.camera.translate(0,0,0.25);
+                // console.log(scene.camera.cameraPosition);
+                break;
+            case 83: // move back S
+                scene.camera.translate(0,0,-0.25);
+                // console.log(scene.camera.cameraPosition);
+                break;
+            case 73: // move UP
+                scene.camera.translate(0,-0.25,0);
+                // console.log(scene.camera.cameraPosition);
+                break;
+            case 75: // move DOWN
+                scene.camera.translate(0,0.25,0);
+                // console.log(scene.camera.cameraPosition);
+                break;
+            default:
+                console.log(event.keyCode);
+                break;
+        }
     });
 }
 
@@ -216,16 +250,44 @@ function initScene( name ){
     var floor_model = Model.getFloorModel();
     var bck_model = Model.getBackgroundModel();
 
+    var camera = new Camera();
+    camera.rotate(0,30,0);
+    camera.lookAt(0,0,0);
+    camera.translate(0,0,0.3);
+
+    scene.addCamera(camera);
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
     scene.addModel(floor_model);
     scene.addModel(bck_model);
 
+    // Criação objetos
     var cube = scene.addObject(cube_model.gl_model);
-    cube.translate(0, 0.4, 0);
+    cube.positionAt(0, 0.25, 0);
+    cube.material.kAmbient(0.25,0.20,0.07);
+    cube.material.kDiffuse(0.75,0.60,0.23);
+    cube.material.kSpecular(0.63,0.56,0.37);
+    cube.material.nPhongs(51.2);
+
     var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.translate(0.4, -0.5, 0);
-    scene.addObject(floor_model.gl_model);
+    pyramid.positionAt(0.4, -0.5, 0);
+    pyramid.material.kDiffuse(1,0,0);
+    var floor = scene.addObject(floor_model.gl_model);
+    // floor.positionAt(0,0,0);
+    floor.material.kDiffuse(1,1,1);
+    var background = scene.addObject(bck_model.gl_model);
+    background.material.kAmbient(0.21,0.13,0.05);
+    background.material.kDiffuse(0.71,0.43,0.18);    
+    background.material.kSpecular(0.39,0.27,0.17);
+    background.material.nPhongs(25.6);
+    background.positionAt(0,0,0);
+    // Criação da luz
+    var light_source = new LightSource();
+    light_source.positionAt(0.5,0.5,0.5);
+    light_source.type(1);
+    light_source.switchOn();
+    // light_source.switchRotYYOn();
+    scene.addLightSource(light_source);
 }
 
 //----------------------------------------------------------------------------

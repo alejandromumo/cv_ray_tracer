@@ -3,7 +3,7 @@ class Model{
     {
         this.name = name;
         this.positionArray = positionArray;
-        this.colorArray = colorArray;
+        // this.colorArray = colorArray;
         this.normalsArray = normalsArray;
         this.gl_model = null;
     }
@@ -102,99 +102,99 @@ class Model{
             0.25, -0.25, -0.25,
         ];
 
-        cube.colorArray = [
+        // cube.colorArray = [
 
-            // FRONT FACE
+        //     // FRONT FACE
 
-            1.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
-            1.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
-            1.00,  0.00,  0.00,
-
-
-            1.00,  0.00,  0.00,
-
-            1.00,  0.00,  0.00,
-
-            1.00,  0.00,  0.00,
-
-            // TOP FACE
-
-            0.00,  0.00,  0.00,
-
-            0.00,  0.00,  0.00,
-
-            0.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
 
-            0.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
-            0.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
-            0.00,  0.00,  0.00,
+        //     1.00,  0.00,  0.00,
 
-            // BOTTOM FACE
+        //     // TOP FACE
 
-            0.00,  1.00,  0.00,
+        //     0.00,  0.00,  0.00,
 
-            0.00,  1.00,  0.00,
+        //     0.00,  0.00,  0.00,
 
-            0.00,  1.00,  0.00,
-
-
-            0.00,  1.00,  0.00,
-
-            0.00,  1.00,  0.00,
-
-            0.00,  1.00,  0.00,
-
-            // LEFT FACE
-
-            0.00,  0.00,  1.00,
-
-            0.00,  0.00,  1.00,
-
-            0.00,  0.00,  1.00,
+        //     0.00,  0.00,  0.00,
 
 
-            0.00,  0.00,  1.00,
+        //     0.00,  0.00,  0.00,
 
-            0.00,  0.00,  1.00,
+        //     0.00,  0.00,  0.00,
 
-            0.00,  0.00,  1.00,
+        //     0.00,  0.00,  0.00,
 
-            // RIGHT FACE
+        //     // BOTTOM FACE
 
-            0.25,  0.50,  0.50,
+        //     0.00,  1.00,  0.00,
 
-            0.25,  0.50,  0.50,
+        //     0.00,  1.00,  0.00,
 
-            0.25,  0.50,  0.50,
-
-
-            0.25,  0.50,  0.50,
-
-            0.25,  0.50,  0.50,
-
-            0.25,  0.50,  0.50,
+        //     0.00,  1.00,  0.00,
 
 
-            // BACK FACE
+        //     0.00,  1.00,  0.00,
 
-            0.25,  0.00,  0.75,
+        //     0.00,  1.00,  0.00,
 
-            0.25,  0.00,  0.75,
+        //     0.00,  1.00,  0.00,
 
-            0.25,  0.00,  0.75,
+        //     // LEFT FACE
+
+        //     0.00,  0.00,  1.00,
+
+        //     0.00,  0.00,  1.00,
+
+        //     0.00,  0.00,  1.00,
 
 
-            0.25,  0.00,  0.75,
+        //     0.00,  0.00,  1.00,
 
-            0.25,  0.00,  0.75,
+        //     0.00,  0.00,  1.00,
 
-            0.25,  0.00,  0.75,
-        ];
+        //     0.00,  0.00,  1.00,
+
+        //     // RIGHT FACE
+
+        //     0.25,  0.50,  0.50,
+
+        //     0.25,  0.50,  0.50,
+
+        //     0.25,  0.50,  0.50,
+
+
+        //     0.25,  0.50,  0.50,
+
+        //     0.25,  0.50,  0.50,
+
+        //     0.25,  0.50,  0.50,
+
+
+        //     // BACK FACE
+
+        //     0.25,  0.00,  0.75,
+
+        //     0.25,  0.00,  0.75,
+
+        //     0.25,  0.00,  0.75,
+
+
+        //     0.25,  0.00,  0.75,
+
+        //     0.25,  0.00,  0.75,
+
+        //     0.25,  0.00,  0.75,
+        // ];
 
         computeVertexNormals(cube.positionArray, cube.normalsArray);
         return cube;
@@ -246,46 +246,46 @@ class Model{
             0.25 , 0.00 , 0.00, //v2
         ];
 
-        pyramid.colorArray = [
-            // Base
-            1.00, 0.00, 0.00,
+        // pyramid.colorArray = [
+        //     // Base
+        //     1.00, 0.00, 0.00,
 
-            1.00, 0.00, 0.00,
+        //     1.00, 0.00, 0.00,
 
-            1.00, 0.00, 0.00,
+        //     1.00, 0.00, 0.00,
 
-            1.00, 0.00, 0.00,
+        //     1.00, 0.00, 0.00,
 
-            1.00, 0.00, 0.00,
+        //     1.00, 0.00, 0.00,
 
-            1.00, 0.00, 0.00,
+        //     1.00, 0.00, 0.00,
 
-            // Left side
-            0.00, 1.00, 0.00,
+        //     // Left side
+        //     0.00, 1.00, 0.00,
 
-            0.00, 1.00, 0.00,
+        //     0.00, 1.00, 0.00,
 
-            0.00, 1.00, 0.00,
+        //     0.00, 1.00, 0.00,
 
-            // Right side
-            0.00, 0.00, 1.00,
+        //     // Right side
+        //     0.00, 0.00, 1.00,
 
-            0.00, 0.00, 1.00,
+        //     0.00, 0.00, 1.00,
 
-            0.00, 0.00, 1.00,
-            // Front side
-            1.00, 0.00, 1.00,
+        //     0.00, 0.00, 1.00,
+        //     // Front side
+        //     1.00, 0.00, 1.00,
 
-            1.00, 0.00, 1.00,
+        //     1.00, 0.00, 1.00,
 
-            1.00, 0.00, 1.00,
-            // Back side
-            0.00, 1.00, 1.00,
+        //     1.00, 0.00, 1.00,
+        //     // Back side
+        //     0.00, 1.00, 1.00,
 
-            0.00, 1.00, 1.00,
+        //     0.00, 1.00, 1.00,
 
-            0.00, 1.00, 1.00,
-        ];
+        //     0.00, 1.00, 1.00,
+        // ];
         computeVertexNormals(pyramid.positionArray, pyramid.normalsArray)
         return pyramid;
     }
@@ -294,34 +294,33 @@ class Model{
     {
         var floor = new Model("floor");
         floor.positionArray = [
-            1.00 , 0.00, 1.00,
+            1.00 , -1.00, 1.00,
 
-            -1.00 , 0.00, 1.00,
+            1.00 , -1.00, -1.00,
 
-            -1.00 , 0.00, -1.00,
-
-
-            1.00, 0.00,  1.00,
-
-            -1.00, 0.00, -1.00,
+            -1.00 , -1.00, 1.00,
 
 
-            1.00, 0.00, -1.00
+            -1.00, -1.00,  1.00,
+
+            1.00, -1.00, -1.00,
+
+            -1.00, -1.00, -1.00
         ];
 
-        floor.colorArray = [
-            0.25, 0.20, 0,
+        // floor.colorArray = [
+        //     0.25, 0.20, 0,
 
-            0.25, 0.20, 0,
+        //     0.25, 0.20, 0,
 
-            0.25, 0.20, 0,
+        //     0.25, 0.20, 0,
 
-            0.25, 0.20, 0,
+        //     0.25, 0.20, 0,
 
-            0.25, 0.20, 0,
+        //     0.25, 0.20, 0,
 
-            0.25, 0.20, 0
-        ];
+        //     0.25, 0.20, 0
+        // ];
         computeVertexNormals(floor.positionArray, floor.normalsArray)
         return floor;
     }
@@ -330,32 +329,32 @@ class Model{
     {
         var background = new Model("background");
         background.positionArray = [
-            1.00 , 0.00, -1.00,
+            1.00 , -1.00, -1.00,
 
             1.00 , 1.00, -1.00,
 
-            -1.00 , 1.00, -1.00,
+            -1.00 , -1.00, -1.00,
 
-            1.00, 0.00, -1.00,
+            -1.00, -1.00, -1.00,
 
-            -1.00, 1.00, -1.00,
+            1.00, 1.00, -1.00,
 
-            -1.00, 0.00, -1.00
+            -1.00, 1.00, -1.00
         ];
 
-        background.colorArray = [
-            0.30, 0.30, 0.30,
+        // background.colorArray = [
+        //     0.30, 0.30, 0.30,
 
-            0.30, 0.30, 0.30,
+        //     0.30, 0.30, 0.30,
 
-            0.30, 0.30, 0.30,
+        //     0.30, 0.30, 0.30,
 
-            0.30, 0.30, 0.30,
+        //     0.30, 0.30, 0.30,
 
-            0.30, 0.30, 0.30,
+        //     0.30, 0.30, 0.30,
 
-            0.30, 0.30, 0.30,
-        ];
+        //     0.30, 0.30, 0.30,
+        // ];
         computeVertexNormals(background.positionArray, background.normalsArray)
         return background;
     }
@@ -365,6 +364,11 @@ class Model{
         var sphere = new Model("sphere");
         sphere.positionArray = [];  // TODO
         sphere.colorArray = [];     // TODO
+    }
+
+    static getVolumeModel()
+    {
+
     }
 
 
@@ -390,6 +394,7 @@ class Model{
                 {
                     // For every vertex we have 3 floating point values
                     for( j = 1; j < 4; j++ ) {
+                        console.log(parseFloat(tokens[j]))
                         newVertices.push( parseFloat( tokens[ j ] ) );
                     }
                 }
@@ -402,20 +407,18 @@ class Model{
                 }
             }
 
-            var obj =  new Model(file.name, newVertices.slice(), newNormals.slice(), newVertices.slice());
             // Assigning to the current model
-            //vertices = newVertices.slice();
-            //normals = newNormals.slice();
             // Checking to see if the normals are defined on the file
-            //if( normals.length == 0 )
-            //{
-            //    computeVertexNormals( vertices, normals );
-            //}
+            if( newNormals.length == 0 )
+            {
+               computeVertexNormals( newVertices, newNormals );
+            }
+            var obj =  new Model(file.name, newVertices, newVertices, newNormals);
             scene.addModel(obj);
-            //console.log("sucess"); 
             var xD = scene.addObject(obj.gl_model);
             xD.rotate(40,10,20)
-            //scene.drawScene(projectionType, primitiveType);
+            console.log(xD); 
+            scene.drawScene(projectionType, primitiveType);
         };
         reader.readAsText(file);
     }

@@ -283,8 +283,6 @@ function computeVertexNormals( coordsArray, normalsArray ) {
 		normalsArray.push(normal[0], normal[1], normal[2]);
 		normalsArray.push(normal[0], normal[1], normal[2]);
 		normalsArray.push(normal[0], normal[1], normal[2]);
-
-
 	}
 }
 

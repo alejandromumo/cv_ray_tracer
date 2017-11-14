@@ -36,7 +36,7 @@ function vec3()
 function vec4()
 {
     var result = _argumentsToArray( arguments );
-
+    
     switch ( result.length ) {
     case 0: result.push( 0.0 );
     case 1: result.push( 0.0 );
@@ -123,24 +123,24 @@ function vectorProduct( v1, v2 )
 {
     var res = vec3();
 
-	res[0] = v1[1] * v2[2] - v1[2] * v2[1];
+    res[0] = v1[1] * v2[2] - v1[2] * v2[1];
 
-	res[1] = - ( v1[0] * v2[2] - v1[2] * v2[0] );
+    res[1] = - ( v1[0] * v2[2] - v1[2] * v2[0] );
 
-	res[2] = v1[0] * v2[1] - v1[1] * v2[0];
+    res[2] = v1[0] * v2[1] - v1[1] * v2[0];
 
-	return res;
+    return res;
 }
 
 //----------------------------------------------------------------------------
 
 function computeNormalVector( p0, p1, p2 )
 {
-	var v1 = vec3();
+    var v1 = vec3();
 
-	var v2 = vec3();
+    var v2 = vec3();
 
-	var result = vec3();
+    var result = vec3();
 
     v1[0] = p1[0] - p0[0];
 
@@ -165,30 +165,30 @@ function computeNormalVector( p0, p1, p2 )
 
 function multiplyPointByMatrix( m, p )
 {
-	var result = vec4();
-	
-	for( var i = 0; i < 4; i++ ) {
-		
-		for( var j = 0; j < 4; j++ ) {
-		
-				result[i] += m[i][j] * p[j];
-		}
-	}
-	
-	return result;
+    var result = vec4();
+    
+    for( var i = 0; i < 4; i++ ) {
+        
+        for( var j = 0; j < 4; j++ ) {
+        
+                result[i] += m[i][j] * p[j];
+        }
+    }
+    
+    return result;
 }
 
 function multiplyVectorByMatrix( m, p )
 {
-	var result = vec4();
-	
-	for( var i = 0; i < 4; i++ ) {
-		
-		for( var j = 0; j < 4; j++ ) { 	// Can stop earlier; 4th coord is ZERO !!
-		
-				result[i] += m[i][j] * p[j];
-		}
-	}
-	
-	return result;
+    var result = vec4();
+    
+    for( var i = 0; i < 4; i++ ) {
+        
+        for( var j = 0; j < 4; j++ ) {  // Can stop earlier; 4th coord is ZERO !!
+        
+                result[i] += m[i][j] * p[j];
+        }
+    }
+    
+    return result;
 }

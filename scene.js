@@ -5,15 +5,16 @@ class Scene{
         this.name = name;
 
         this.objects = [];
-        this.light_sources = []; // TODO
+        this.light_sources = [];
         this.models = [];
 
-        this.camera = null;      // TODO
+        this.camera = null;
         this.pMatrix = mat4();
 
         this.next_model_index = 0;
         this.model_vertices = [];
-        this.model_colors = [];
+        this.normals = [];
+        this.viewerPosition = [0,0,0,0];
     }
 
     drawScene(projectionType, primitiveType)
@@ -22,27 +23,41 @@ class Scene{
 
         // Computing the Projection Matrix
         this.computeProjectionMatrix(projectionType);
+        this.computeViewerPosition();
+        var l = this.light_sources[0];
         this.objects.forEach(function(myObject)
         {
+            if(l.isOn)
+            	myObject.computeLight(l);
             myObject.drawObject(primitiveType);
         });
     }
 
     computeProjectionMatrix(projectionType)
     {
+        this.camera.computeCameraMatrix();
+        this.camera.computeViewMatrix();
+
         if( projectionType == 0 ) {
             this.pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
             globalTz = 0;
         }
         else {
             this.pMatrix = perspective( 45, 1, 0.05, 15 );
-            globalTz = -3.5;
+            this.pMatrix = mult(this.pMatrix, this.camera.cameraMatrix);
+            globalTz = -4.5;
         }
 
         var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
 
         gl.uniformMatrix4fv(pUniform, false,
                              new Float32Array(flatten(this.pMatrix)));
+    }
+
+    computeViewerPosition()
+    {
+		gl.uniform4fv( gl.getUniformLocation(shaderProgram, "viewerPosition"),
+	        flatten(this.camera.cameraPosition) );
     }
 
     addModel(model)
@@ -52,7 +67,7 @@ class Scene{
         model.gl_model = gl_model;
 
         this.model_vertices = this.model_vertices.concat(model.positionArray);
-        this.model_colors = this.model_colors.concat(model.colorArray);
+        this.normals = this.normals.concat(model.normalsArray);
         this.initBuffers();
 
         this.next_model_index += gl_model.size;
@@ -63,6 +78,16 @@ class Scene{
         var newObject = new myObject(gl_model);
         this.objects.push(newObject);
         return newObject;
+    }
+
+    addCamera(camera)
+    {
+    	this.camera = camera;
+    }
+
+    addLightSource(ls)
+    {
+        this.light_sources.push(ls);
     }
 
     initBuffers() {
@@ -79,21 +104,17 @@ class Scene{
                 triangleVertexPositionBuffer.itemSize,
                 gl.FLOAT, false, 0, 0);
 
-        // Colors
-        triangleVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model_colors), gl.STATIC_DRAW);
-        triangleVertexColorBuffer.itemSize = 3;
-        triangleVertexColorBuffer.numItems = this.model_colors.length / 3;
+        // Vertex Normal Vectors
+        triangleVertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals), gl.STATIC_DRAW);
+        triangleVertexNormalBuffer.itemSize = 3;
+        triangleVertexNormalBuffer.numItems = this.normals.length / 3;           
 
         // Associating to the vertex shader
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute,
-                triangleVertexColorBuffer.itemSize,
-                gl.FLOAT, false, 0, 0);
-    }
-
-    computeIllumination()
-    {
-        // TODO
+        
+        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 
+                triangleVertexNormalBuffer.itemSize, 
+                gl.FLOAT, false, 0, 0); 
     }
 }
