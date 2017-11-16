@@ -3,6 +3,7 @@
 
 var gll = null; // WebGL context
 var glr = null;
+var frustum = null;
 
 var scenel = null;
 var scener = null;
@@ -34,9 +35,9 @@ function animate( scene ) {
         // do stuff to animate scene
         // namely rotate objects and stuff
 
-        scene.objects[0].deltarotate(1,0,0);
-        scene.objects[1].deltarotate(2,1,0.3);
-        scene.objects[4].deltarotate(0,1,0);
+        //scene.objects[0].deltarotate(1,0,0);
+        //scene.objects[1].deltarotate(2,1,0.3);
+        //scene.objects[4].deltarotate(0,1,0);
     }
 
     lastTime = timeNow;
@@ -146,24 +147,30 @@ function setEventListeners(){
 
     document.addEventListener('keydown', function(event){
         switch(event.keyCode){
-            case 37: // rotate left LEFTKEY
+            case 65: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
+                frustum.deltarotate(0,10,0)
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
+                frustum.deltarotate(-10,0,0)
                 break;
-            case 39: // rotate right RIGHTKEY
+            case 68: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
+                frustum.deltarotate(0,-10,0)
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
+                frustum.deltarotate(10,0,0)
                 break;
             case 87: // move front W
                 scener.camera.translate(0,0,-0.25);
+                frustum.translate(0,0,-0.25);
                 // console.log(scener.camera.cameraPosition);
                 break;
             case 83: // move back S
                 scener.camera.translate(0,0,0.25);
+                frustum.translate(0,0,0.25);
                 // console.log(scener.camera.cameraPosition);
                 break;
             case 73: // move UP
@@ -220,7 +227,6 @@ function initWebGL( canvas ) {
 
 
 function initScene( name , gl , shaderProgram){
-
     var scene = new Scene(name, gl, shaderProgram);
 
     var cube_model = Model.getCubeModel();
@@ -229,12 +235,6 @@ function initScene( name , gl , shaderProgram){
     var bck_model = Model.getBackgroundModel();
     var sphere_model = Model.getSphereModel();
 
-    var camera = new Camera();
-    camera.rotate(0,0,0);
-    camera.lookAt(0,0,0);
-    camera.positionAt(0,0,5);
-
-    scene.addCamera(camera);
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
     scene.addModel(floor_model);
@@ -243,33 +243,55 @@ function initScene( name , gl , shaderProgram){
 
     // Criação objetos
     var cube = scene.addObject(cube_model.gl_model);
-    cube.positionAt(0, 0.25, 0);
+    cube.positionAt(-0.75, -0.75, -0.75);
     cube.material.kAmbient(0.25,0.20,0.07);
     cube.material.kDiffuse(0.75,0.60,0.23);
     cube.material.kSpecular(0.63,0.56,0.37);
     cube.material.nPhongs(51.2);
 
     var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt(0.4, -0.5, 0);
+    pyramid.positionAt( 0.75, -1,-0.75);
     pyramid.material.kDiffuse(1,0,0);
 
     var floor = scene.addObject(floor_model.gl_model);
     floor.material.kDiffuse(1,1,1);
 
+    var ceiling = scene.addObject(floor_model.gl_model);
+    ceiling.material.kAmbient(0.21,0.13,0.05);
+    // +2 bcs floor model is defined at -1;
+    ceiling.rotate(0,0,180)
+    ceiling.positionAt(0,0,0);
+
     var background = scene.addObject(bck_model.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
-    background.material.kDiffuse(0.71,0.43,0.18);    
+    background.material.kDiffuse(0.71,0.43,0.18);
     background.material.kSpecular(0.39,0.27,0.17);
     background.material.nPhongs(25.6);
     background.positionAt(0,0,0);
 
+    var leftwall = scene.addObject(bck_model.gl_model);
+    leftwall.material.kAmbient(0.21,0.13,0.05);
+    leftwall.material.kDiffuse(0.71,0.43,0.18);
+    leftwall.material.kSpecular(0.39,0.27,0.17);
+    leftwall.material.nPhongs(25.6);
+    leftwall.rotate(0,90,0)
+    leftwall.positionAt(0,0,0);
+
+    var rightwall = scene.addObject(bck_model.gl_model);
+    rightwall.material.kAmbient(0.21,0.13,0.05);
+    rightwall.material.kDiffuse(0.71,0.43,0.18);
+    rightwall.material.kSpecular(0.39,0.27,0.17);
+    rightwall.material.nPhongs(25.6);
+    rightwall.rotate(0,270,0)
+    rightwall.positionAt(0,0,0);
+
     var sphere = scene.addObject(sphere_model.gl_model);
-    sphere.positionAt(0.4,1,0);
+    sphere.positionAt(0.55,-0.65,0.55);
     sphere.material.kAmbient(0.21,0.13,0.05);
     sphere.material.kDiffuse(0.71,0.43,0.18);    
     sphere.material.kSpecular(0.39,0.27,0.17);
     sphere.material.nPhongs(25.6);
-    sphere.scale(0.55,0.55,0.55);
+    sphere.scale(0.35,0.35,0.35);
 
     // Criação da luz
     var light_source = new LightSource();
@@ -279,6 +301,16 @@ function initScene( name , gl , shaderProgram){
     // light_source.switchRotYYOn();
     scene.addLightSource(light_source);
     return scene;
+}
+
+function addFrustum(scene){
+    var pyramid_model = Model.getPyramidModel();
+    scene.addModel(pyramid_model);
+    var pyramid = scene.addObject(pyramid_model.gl_model);
+    pyramid.positionAt( 0.09375, 0.25,3.5);
+    pyramid.rotate(90,0,0);
+    pyramid.material.kDiffuse(0,0,1);
+    return pyramid
 }
 
 //----------------------------------------------------------------------------
@@ -296,9 +328,20 @@ function runWebGL() {
     setEventListeners();
 
     scenel = initScene("scene1", gll , shaderPrograml);
-    scener = initScene("scene2", glr , shaderProgramr);
+    frustum = addFrustum(scenel)
+    var camera = new Camera();
+    camera.rotate(0,55,0);
+    camera.positionAt(5,1,5);
+    scenel.addCamera(camera);
+    //scenel.drawScene(projectionType, primitiveType);
 
-    scenel.light_sources[0].switchOff();
+    scener = initScene("scene2", glr , shaderProgramr);
+    var camera2= new Camera();
+    camera2.positionAt(0,0,3);
+    scener.addCamera(camera2);
+    //scener.drawScene(projectionType, primitiveType);
+
+    //scenel.light_sources[0].switchOff();
     tick();
 
     outputInfos();
