@@ -2,20 +2,23 @@ class Camera{
 
     constructor()
     {
-        this.tx = 0;
-        this.ty = 0;
-        this.tz = 0;
-
         this.angleXX = 0;
         this.angleYY = 0;
         this.angleZZ = 0;
 
-        this.target = vec4();
+        this.target = vec3();
 
         this.cameraMatrix = mat4(); // TODO confirmar o lookAt
         this.viewMatrix = mat4();
 
-        this.cameraPosition = vec4();
+        this.cameraPosition = vec3();
+
+        this.up = vec3();
+        this.up[0] = 0;
+        this.up[1] = 1;
+        this.up[2] = 0;
+
+        this.print = 0;
     }
 
     rotate(angleXX, angleYY, angleZZ)
@@ -34,13 +37,14 @@ class Camera{
 
     translate(tx, ty, tz)
     {
-        this.tx += tx;
-        this.ty += ty;
-        this.tz += tz;
+        this.cameraPosition[0] += tx;
+        this.cameraPosition[1] += ty;
+        this.cameraPosition[2] += tz;
     }
 
     positionAt(x,y,z)
     {
+
         this.cameraPosition[0] = x;
         this.cameraPosition[1] = y;
         this.cameraPosition[2] = z;
@@ -48,26 +52,36 @@ class Camera{
 
     computeCameraMatrix()
     {
-        this.cameraMatrix = translationMatrix( globalTx, globalTy, globalTz ); // change for world matrix 
-        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.tx, this.ty, this.tz));
-         this.cameraMatrix = mult(this.cameraMatrix, rotationXXMatrix(this.angleXX));
+        this.cameraMatrix = mat4();
+
+        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.cameraPosition[0], this.cameraPosition[1], this.cameraPosition[2]));
+        this.cameraMatrix = mult(this.cameraMatrix, rotationXXMatrix(this.angleXX));
         this.cameraMatrix = mult(this.cameraMatrix, rotationYYMatrix(this.angleYY));
-          this.cameraMatrix = mult(this.cameraMatrix, rotationZZMatrix(this.angleZZ));
+        this.cameraMatrix = mult(this.cameraMatrix, rotationZZMatrix(this.angleZZ));
+        
 
         this.cameraPosition[0] = this.cameraMatrix[0][3];
         this.cameraPosition[1] = this.cameraMatrix[1][3];
         this.cameraPosition[2] = this.cameraMatrix[2][3];
 
-        var up = vec3();
-        up[0] = 0;
-        up[1] = 1;
-        up[2] = 0;
-        // this.cameraMatrix = lookAt(this.cameraPosition, this.target, up);
+
+
+        //this.cameraMatrix = lookAt(this.cameraPosition, this.target, up);
+        // if(this.print < 2)
+        // {
+        //     console.log("camera position : " + this.cameraPosition);
+        //     console.log("target position: " + this.target);
+        //     console.log("up vector: " + this.up);
+        //     this.cameraMatrix = lookAt(this.cameraPosition, this.target, this.up);
+        //     this.print += 1;
+        // }
+        // else
+        //     this.cameraMatrix = lookAt(this.cameraPosition, this.target, this.up);
     }
 
     computeViewMatrix()
     {
-        this.viewMatrix = inverse(this.cameraMatrix);
+        this.viewMatrix = matrix_invert(this.cameraMatrix);
     }
 
 
@@ -76,7 +90,6 @@ class Camera{
         this.target[0] = x;
         this.target[1] = y;
         this.target[2] = z;
-        this.target[3] = 1;
     }
 
 }

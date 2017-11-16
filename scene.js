@@ -12,11 +12,14 @@ class Scene{
 
         this.camera = null;
         this.pMatrix = mat4();
+        this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+        this.near = 0.05;
+        this.far = 15;
+        this.fieldofview = 45;
 
         this.next_model_index = 0;
         this.model_vertices = [];
         this.normals = [];
-        this.viewerPosition = [0,0,0,0];
     }
 
     drawScene(projectionType, primitiveType)
@@ -42,12 +45,10 @@ class Scene{
 
         if( projectionType == 0 ) {
             this.pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
-            globalTz = 0;
         }
         else {
-            this.pMatrix = perspective( 45, 1, 0.05, 15 );
-            this.pMatrix = mult(this.pMatrix, this.camera.cameraMatrix);
-            globalTz = -4.5;
+            this.pMatrix = perspective( this.fieldofview, this.aspect, this.near, this.far );
+            this.pMatrix = mult(this.pMatrix, this.camera.viewMatrix);
         }
 
         var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
@@ -58,8 +59,9 @@ class Scene{
 
     computeViewerPosition()
     {
+        var tmp = this.camera.cameraPosition.concat([1]);
 		this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "viewerPosition"),
-	        flatten(this.camera.cameraPosition) );
+	        flatten(tmp) );
     }
 
     addModel(model)

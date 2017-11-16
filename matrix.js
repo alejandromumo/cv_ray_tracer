@@ -116,16 +116,33 @@ function lookAt(cameraPosition, target, up)
     var zAxis = subtract(cameraPosition, target);
     normalize(zAxis);
     var xAxis = vectorProduct(up, zAxis);
+    normalize(xAxis);
     var yAxis = vectorProduct(zAxis, xAxis);
- 
-    var array =  [ xAxis[0], xAxis[1], xAxis[2], 0,
-    yAxis[0], yAxis[1], yAxis[2], 0,
-    zAxis[0], zAxis[1], zAxis[2], 0,
-    cameraPosition[0],cameraPosition[1],cameraPosition[2],1];
 
-    var matrix4 = array_to_mat4(array);
-    console.log(matrix4);
-    return matrix4;
+    var cameraMatrix = mat4();
+
+    cameraMatrix[0][0] = xAxis[0];
+    cameraMatrix[0][1] = xAxis[1];
+    cameraMatrix[0][2] = xAxis[2];
+    cameraMatrix[0][3] = 0;
+
+    cameraMatrix[1][0] = yAxis[0];
+    cameraMatrix[1][1] = yAxis[1];
+    cameraMatrix[1][2] = yAxis[2];
+    cameraMatrix[1][3] = 0;
+
+    cameraMatrix[2][0] = zAxis[0];
+    cameraMatrix[2][1] = zAxis[1];
+    cameraMatrix[2][2] = zAxis[2];
+    cameraMatrix[2][3] = 0;
+
+    cameraMatrix[3][0] = cameraPosition[0];
+    cameraMatrix[3][1] = cameraPosition[1];
+    cameraMatrix[3][2] = cameraPosition[2];
+    cameraMatrix[3][3] = 1;
+
+
+    return cameraMatrix;
 }
 
 //----------------------------------------------------------------------------

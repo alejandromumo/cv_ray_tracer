@@ -201,79 +201,84 @@ function copy(src) {
     return dst;
 }
 
-function inverse(m)
-{
-    var m00 = m[0][0];
-    var m01 = m[0][1];
-    var m02 = m[0][2];
-    var m03 = m[0][3];
-    var m10 = m[1][0];
-    var m11 = m[1][1];
-    var m12 = m[1][2];
-    var m13 = m[1][3];
-    var m20 = m[2][0];
-    var m21 = m[2][1];
-    var m22 = m[2][2];
-    var m23 = m[2][3];
-    var m30 = m[3][0];
-    var m31 = m[3][1];
-    var m32 = m[3][2];
-    var m33 = m[3][3];
-    var tmp_0  = m22 * m33;
-    var tmp_1  = m32 * m23;
-    var tmp_2  = m12 * m33;
-    var tmp_3  = m32 * m13;
-    var tmp_4  = m12 * m23;
-    var tmp_5  = m22 * m13;
-    var tmp_6  = m02 * m33;
-    var tmp_7  = m32 * m03;
-    var tmp_8  = m02 * m23;
-    var tmp_9  = m22 * m03;
-    var tmp_10 = m02 * m13;
-    var tmp_11 = m12 * m03;
-    var tmp_12 = m20 * m31;
-    var tmp_13 = m30 * m21;
-    var tmp_14 = m10 * m31;
-    var tmp_15 = m30 * m11;
-    var tmp_16 = m10 * m21;
-    var tmp_17 = m20 * m11;
-    var tmp_18 = m00 * m31;
-    var tmp_19 = m30 * m01;
-    var tmp_20 = m00 * m21;
-    var tmp_21 = m20 * m01;
-    var tmp_22 = m00 * m11;
-    var tmp_23 = m10 * m01;
-
-    var t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) - (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
-    var t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) - (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
-    var t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
-    var t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
-
-    var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
-    var array =  [
-      d * t0,d * t1,d * t2,d * t3,
-      d * ((tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30) - (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30)),
-      d * ((tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30) - (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30)), d * ((tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30) - (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30)),
-      d * ((tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20) -
-        (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20)),
-      d * ((tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33) -
-        (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33)),
-      d * ((tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33) -
-        (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33)),
-      d * ((tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33) -
-        (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33)),
-      d * ((tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23) -
-        (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23)),
-      d * ((tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12) -
-        (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22)),
-      d * ((tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22) -
-        (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02)),
-      d * ((tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02) -
-        (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12)),
-      d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) -
-        (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02))
-    ];
-
-    var matrix4 = array_to_mat4(array);
-    return matrix4;
+// Algorithm from:
+// http://blog.acipo.com/matrix-inversion-in-javascript/
+// Returns the inverse of matrix `M`.
+function matrix_invert(M){
+    // I use Guassian Elimination to calculate the inverse:
+    // (1) 'augment' the matrix (left) by the identity (on the right)
+    // (2) Turn the matrix on the left into the identity by elemetry row ops
+    // (3) The matrix on the right is the inverse (was the identity matrix)
+    // There are 3 elemtary row ops: (I combine b and c in my code)
+    // (a) Swap 2 rows
+    // (b) Multiply a row by a scalar
+    // (c) Add 2 rows
+    
+    //if the matrix isn't square: exit (error)
+    if(M.length !== M[0].length){return;}
+    
+    //create the identity matrix (I), and a copy (C) of the original
+    var i=0, ii=0, j=0, dim = M.length, e=0, t=0;
+    var I = mat4(), C = copy(M);
+    // Perform elementary row operations
+    for(i=0; i<dim; i+=1){
+        // get the element e on the diagonal
+        e = C[i][i];
+        
+        // if we have a 0 on the diagonal (we'll need to swap with a lower row)
+        if(e==0){
+            //look through every row below the i'th row
+            for(ii=i+1; ii<dim; ii+=1){
+                //if the ii'th row has a non-0 in the i'th col
+                if(C[ii][i] != 0){
+                    //it would make the diagonal have a non-0 so swap it
+                    for(j=0; j<dim; j++){
+                        e = C[i][j];       //temp store i'th row
+                        C[i][j] = C[ii][j];//replace i'th row by ii'th
+                        C[ii][j] = e;      //repace ii'th by temp
+                        e = I[i][j];       //temp store i'th row
+                        I[i][j] = I[ii][j];//replace i'th row by ii'th
+                        I[ii][j] = e;      //repace ii'th by temp
+                    }
+                    //don't bother checking other rows since we've swapped
+                    break;
+                }
+            }
+            //get the new diagonal
+            e = C[i][i];
+            //if it's still 0, not invertable (error)
+            if(e==0){return}
+        }
+        
+        // Scale this row down by e (so we have a 1 on the diagonal)
+        for(j=0; j<dim; j++){
+            C[i][j] = C[i][j]/e; //apply to original matrix
+            I[i][j] = I[i][j]/e; //apply to identity
+        }
+        
+        // Subtract this row (scaled appropriately for each row) from ALL of
+        // the other rows so that there will be 0's in this column in the
+        // rows above and below this one
+        for(ii=0; ii<dim; ii++){
+            // Only apply to other rows (we want a 1 on the diagonal)
+            if(ii==i){continue;}
+            
+            // We want to change this element to 0
+            e = C[ii][i];
+            
+            // Subtract (the row above(or below) scaled by e) from (the
+            // current row) but start at the i'th column and assume all the
+            // stuff left of diagonal is 0 (which it should be if we made this
+            // algorithm correctly)
+            for(j=0; j<dim; j++){
+                C[ii][j] -= e*C[i][j]; //apply to original matrix
+                I[ii][j] -= e*I[i][j]; //apply to identity
+            }
+        }
+    }
+    
+    //we've done all operations, C should be the identity
+    //matrix I should be the inverse:
+    return I;
 }
+

@@ -26,7 +26,8 @@ class myObject{
 
     computeMvMatrix()
     {
-        this.u_mvMatrix = translationMatrix( globalTx, globalTy, globalTz ); // change for world matrix 
+
+        this.u_mvMatrix = mat4();
 
         this.u_mvMatrix = mult( this.u_mvMatrix, 
                               translationMatrix( this.tx, this.ty, this.tz ) );

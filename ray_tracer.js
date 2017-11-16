@@ -11,17 +11,6 @@ var shaderProgram = null;
 var triangleVertexPositionBuffer = null;
 var triangleVertexNormalBuffer = null;
 
-// The GLOBAL transformation parameters
-var globalAngleYY = 0.0;
-var globalTx = 0.0;
-var globalTy = -1;
-var globalTz = 0.0;
-
-// GLOBAL Animation controls
-var globalRotationYY_ON = 1;
-var globalRotationYY_DIR = 1;
-var globalRotationYY_SPEED = 1;
-
 // To allow choosing the way of drawing the model triangles
 var primitiveType = 2;
 
@@ -47,7 +36,7 @@ function animate( scene ) {
 
         scene.objects[0].deltarotate(1,0,0);
         scene.objects[1].deltarotate(2,1,0.3);
-        // scene.objects[3].deltarotate(0,1,0);
+        scene.objects[4].deltarotate(0,1,0);
     }
 
     lastTime = timeNow;
@@ -158,32 +147,32 @@ function setEventListeners(){
     document.addEventListener('keydown', function(event){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
-                scene.camera.deltaRotate(0,-10,0);
+                scener.camera.deltaRotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
-                scene.camera.deltaRotate(10,0,0);
+                scener.camera.deltaRotate(-10,0,0);
                 break;
             case 39: // rotate right RIGHTKEY
-                scene.camera.deltaRotate(0,10,0);
+                scener.camera.deltaRotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
-                scene.camera.deltaRotate(-10,0,0);
+                scener.camera.deltaRotate(10,0,0);
                 break;
             case 87: // move front W
-                scene.camera.translate(0,0,0.25);
-                // console.log(scene.camera.cameraPosition);
+                scener.camera.translate(0,0,-0.25);
+                // console.log(scener.camera.cameraPosition);
                 break;
             case 83: // move back S
-                scene.camera.translate(0,0,-0.25);
-                // console.log(scene.camera.cameraPosition);
+                scener.camera.translate(0,0,0.25);
+                // console.log(scener.camera.cameraPosition);
                 break;
             case 73: // move UP
-                scene.camera.translate(0,-0.25,0);
-                // console.log(scene.camera.cameraPosition);
+                scener.camera.translate(0,0.25,0);
+                // console.log(scener.camera.cameraPosition);
                 break;
             case 75: // move DOWN
-                scene.camera.translate(0,0.25,0);
-                // console.log(scene.camera.cameraPosition);
+                scener.camera.translate(0,-0.25,0);
+                // console.log(scener.camera.cameraPosition);
                 break;
             default:
                 console.log(event.keyCode);
@@ -238,17 +227,19 @@ function initScene( name , gl , shaderProgram){
     var pyramid_model = Model.getPyramidModel();
     var floor_model = Model.getFloorModel();
     var bck_model = Model.getBackgroundModel();
+    var sphere_model = Model.getSphereModel();
 
     var camera = new Camera();
-    camera.rotate(0,30,0);
+    camera.rotate(0,0,0);
     camera.lookAt(0,0,0);
-    camera.translate(0,0,0.3);
+    camera.positionAt(0,0,5);
 
     scene.addCamera(camera);
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
     scene.addModel(floor_model);
     scene.addModel(bck_model);
+    scene.addModel(sphere_model);
 
     // Criação objetos
     var cube = scene.addObject(cube_model.gl_model);
@@ -261,18 +252,28 @@ function initScene( name , gl , shaderProgram){
     var pyramid = scene.addObject(pyramid_model.gl_model);
     pyramid.positionAt(0.4, -0.5, 0);
     pyramid.material.kDiffuse(1,0,0);
+
     var floor = scene.addObject(floor_model.gl_model);
-    // floor.positionAt(0,0,0);
     floor.material.kDiffuse(1,1,1);
+
     var background = scene.addObject(bck_model.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
     background.material.kDiffuse(0.71,0.43,0.18);    
     background.material.kSpecular(0.39,0.27,0.17);
     background.material.nPhongs(25.6);
     background.positionAt(0,0,0);
+
+    var sphere = scene.addObject(sphere_model.gl_model);
+    sphere.positionAt(0.4,1,0);
+    sphere.material.kAmbient(0.21,0.13,0.05);
+    sphere.material.kDiffuse(0.71,0.43,0.18);    
+    sphere.material.kSpecular(0.39,0.27,0.17);
+    sphere.material.nPhongs(25.6);
+    sphere.scale(0.55,0.55,0.55);
+
     // Criação da luz
     var light_source = new LightSource();
-    light_source.positionAt(0.5,0.5,0.5);
+    light_source.positionAt(0,0.2,1.30);
     light_source.type(1);
     light_source.switchOn();
     // light_source.switchRotYYOn();
