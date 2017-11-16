@@ -307,7 +307,7 @@ function addFrustum(scene){
     var pyramid_model = Model.getPyramidModel();
     scene.addModel(pyramid_model);
     var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt( 0.09375, 0.25,3.5);
+    pyramid.positionAt(-0.125,0.125,3.5);
     pyramid.rotate(90,0,0);
     pyramid.material.kDiffuse(0,0,1);
     return pyramid
@@ -331,7 +331,7 @@ function runWebGL() {
     frustum = addFrustum(scenel)
     var camera = new Camera();
     camera.rotate(0,55,0);
-    camera.positionAt(5,1,5);
+    camera.positionAt(5,0,5);
     scenel.addCamera(camera);
     //scenel.drawScene(projectionType, primitiveType);
 
