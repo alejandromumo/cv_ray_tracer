@@ -2766,10 +2766,30 @@ class Model{
 
         cameraX + xl, cameraY - yl, cameraZ - zl, // 6
         cameraX - xl, cameraY + yl, cameraZ - zl, // 8
-        cameraX + xl, cameraY + yl, cameraZ - zl  // 7            
+        cameraX + xl, cameraY + yl, cameraZ - zl, // 7  
+
+        // left face
+        cameraX - x, cameraY - y, cameraZ - z,    // 1
+        cameraX - x, cameraY + y, cameraZ - z,    // 4 
+        cameraX - xl, cameraY - yl, cameraZ - zl, // 5
+
+        cameraX - x, cameraY + y, cameraZ - z,    // 4 
+        cameraX - xl, cameraY + yl, cameraZ - zl, // 8
+        cameraX - xl, cameraY - yl, cameraZ - zl, // 5
+
+
+        // right face
+        cameraX + xl, cameraY - yl, cameraZ - zl, // 6          
+        cameraX + xl, cameraY + yl, cameraZ - zl, // 7  
+        cameraX + x, cameraY + y, cameraZ - z,    // 3
+        
+        cameraX + xl, cameraY - yl, cameraZ - zl, // 6          
+        cameraX + x, cameraY + y, cameraZ - z,    // 3
+        cameraX + x, cameraY - y, cameraZ - z    // 2
+
+
         ];
 
-        console.log(view_volume.positionArray);
         computeVertexNormals(view_volume.positionArray, view_volume.normalsArray);
         return view_volume;
     }

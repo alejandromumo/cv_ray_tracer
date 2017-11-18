@@ -312,7 +312,7 @@ function initScene( name , gl , shaderProgram){
     // Criação da luz
     var light_source = new LightSource();
     light_source.positionAt(0,0.2,1.30);
-    light_source.type(1);
+    light_source.type(0); // 1 -> omni , 0 -> directional
     light_source.switchOn();
     scene.addLightSource(light_source);
     return scene;
@@ -354,8 +354,8 @@ function runWebGL() {
     var camera2= new Camera();
     camera2.positionAt(0,0,3);
     scener.addCamera(camera2);
-    scener.fieldofview = 35;
-    scener.far = 15;
+    scener.fieldofview = 30;
+    scener.far = 5;
     scener.near = 0.5;
     //scener.drawScene(projectionType, primitiveType);
 
