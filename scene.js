@@ -27,7 +27,7 @@ class Scene{
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // Computing the Projection Matrix
-        this.computeProjectionMatrix(projectionType);
+        this.computeProjectionViewMatrix(projectionType);
         this.computeViewerPosition();
         var l = this.light_sources[0];
         this.objects.forEach(function(myObject)
@@ -38,18 +38,16 @@ class Scene{
         });
     }
 
-    computeProjectionMatrix(projectionType)
+    computeProjectionViewMatrix(projectionType)
     {
-        this.camera.computeCameraMatrix();
         this.camera.computeViewMatrix();
 
-        if( projectionType == 0 ) {
+        if( projectionType == 0 )
             this.pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
-        }
-        else {
+        else
             this.pMatrix = perspective( this.fieldofview, this.aspect, this.near, this.far );
-            this.pMatrix = mult(this.pMatrix, this.camera.viewMatrix);
-        }
+
+        this.pMatrix = mult(this.pMatrix, this.camera.viewMatrix);
 
         var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
 
@@ -60,8 +58,7 @@ class Scene{
     computeViewerPosition()
     {
         var tmp = this.camera.cameraPosition.concat([1]);
-		this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "viewerPosition"),
-	        flatten(tmp) );
+		this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "viewerPosition"),flatten(tmp));
     }
 
     addModel(model)

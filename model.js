@@ -2729,14 +2729,48 @@ class Model{
         reader.readAsText(file);
     }
 
-    static getViewVolumeModel(fieldofview, aspect, near, far)
+    static getFrustumModel(fieldofview, near, far, cameraPos)
     {
         var view_volume = new Model("view volume");
+        var teta = (fieldofview / 2) ;
+        teta = radians(teta);
+        var z = near;
+        var zl = far;
+        // var y = Math.sqrt( Math.pow((near/Math.cos(teta)),2) - Math.pow(near,2));
+        var y = trig(teta, near, false, true);
+        var yl = trig(teta, far, false, true);
+        // var yl = Math.sqrt( Math.pow(far/Math.cos(teta),2) - (far * far));
+        var x = trig(teta, y, true, false);
+        var xl = trig(teta, yl, true, false );
+        // var x = Math.sqrt( Math.pow(y/Math.sin(teta),2) - (y * y));
+        // var xl = Math.sqrt( Math.pow(yl/Math.sin(teta),2) - (yl * yl));
+        var cameraX = cameraPos[0];
+        var cameraY = cameraPos[1];
+        var cameraZ = cameraPos[2];
+
+
         view_volume.positionArray = [
-        // Near
+        // front face
+        cameraX - x, cameraY - y, cameraZ - z,    // 1
+        cameraX + x, cameraY - y, cameraZ - z,    // 2
+        cameraX - x, cameraY + y, cameraZ - z,    // 4 
         
+        cameraX + x, cameraY - y, cameraZ - z,    // 2
+        cameraX + x, cameraY + y, cameraZ - z,    // 3
+        cameraX - x, cameraY + y, cameraZ - z,    // 4 
+        
+        // back face
+        cameraX + xl, cameraY - yl, cameraZ - zl, // 6
+        cameraX - xl, cameraY - yl, cameraZ - zl, // 5
+        cameraX - xl, cameraY + yl, cameraZ - zl, // 8
+
+        cameraX + xl, cameraY - yl, cameraZ - zl, // 6
+        cameraX - xl, cameraY + yl, cameraZ - zl, // 8
+        cameraX + xl, cameraY + yl, cameraZ - zl  // 7            
         ];
-        computeVertexNormals(view_volume);
+
+        console.log(view_volume.positionArray);
+        computeVertexNormals(view_volume.positionArray, view_volume.normalsArray);
         return view_volume;
     }
 }

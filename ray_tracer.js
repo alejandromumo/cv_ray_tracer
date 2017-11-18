@@ -3,7 +3,8 @@
 
 var gll = null; // WebGL context
 var glr = null;
-var frustum = null;
+var frustum = null; // pyramid representing right camera on left scene
+var viewVolume = null;
 
 var scenel = null;
 var scener = null;
@@ -34,7 +35,6 @@ function animate( scene ) {
         var elapsed = timeNow - lastTime;
         // do stuff to animate scene
         // namely rotate objects and stuff
-
         //scene.objects[0].deltarotate(1,0,0);
         //scene.objects[1].deltarotate(2,1,0.3);
         //scene.objects[4].deltarotate(0,1,0);
@@ -125,11 +125,11 @@ function setEventListeners(){
         // Getting the selection
         var mode = list.selectedIndex;
         switch(mode){
-            case 0 : primitiveType = gl.TRIANGLES;
+            case 0 : primitiveType = scenel.gl.TRIANGLES;
                 break;
-            case 1 : primitiveType = gl.LINE_LOOP;
+            case 1 : primitiveType = scenel.gl.LINE_LOOP;
                 break;
-            case 2 : primitiveType = gl.POINTS;
+            case 2 : primitiveType = scenel.gl.POINTS;
                 break;
         }
     });
@@ -147,39 +147,55 @@ function setEventListeners(){
 
     document.addEventListener('keydown', function(event){
         switch(event.keyCode){
-            case 65: // rotate left LEFTKEY
+            case 37: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
-                frustum.deltarotate(0,10,0)
+                frustum.deltarotate(0,10,0);
+                viewVolume.deltarotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
-                frustum.deltarotate(-10,0,0)
+                frustum.deltarotate(-10,0,0);
+                viewVolume.deltarotate(-10,0,0);
                 break;
-            case 68: // rotate right RIGHTKEY
+            case 39: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
-                frustum.deltarotate(0,-10,0)
+                frustum.deltarotate(0,-10,0);
+                viewVolume.deltarotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
-                frustum.deltarotate(10,0,0)
+                frustum.deltarotate(10,0,0);
+                viewVolume.deltarotate(10,0,0);
                 break;
             case 87: // move front W
                 scener.camera.translate(0,0,-0.25);
                 frustum.translate(0,0,-0.25);
-                // console.log(scener.camera.cameraPosition);
+                viewVolume.translate(0,0,-0.25);
                 break;
             case 83: // move back S
                 scener.camera.translate(0,0,0.25);
                 frustum.translate(0,0,0.25);
-                // console.log(scener.camera.cameraPosition);
+                viewVolume.translate(0,0,0.25);
                 break;
             case 73: // move UP
                 scener.camera.translate(0,0.25,0);
-                // console.log(scener.camera.cameraPosition);
+                frustum.translate(0,0.25,0);
+                viewVolume.translate(0,0.25,0);
                 break;
             case 75: // move DOWN
                 scener.camera.translate(0,-0.25,0);
-                // console.log(scener.camera.cameraPosition);
+                frustum.translate(0,-0.25,0);
+                viewVolume.translate(0,-0.25,0);
+                break;
+            case 65: // move LEFT A
+                scener.camera.translate(-0.25,0,0);
+                frustum.translate(-0.25,0,0);
+                viewVolume.translate(-0.25,0,0);
+                break;
+            case 68: // move RIGHT D
+                scener.camera.translate(0.25,0,0);
+                frustum.translate(0.25,0,0);
+                viewVolume.translate(0.25,0,0);
                 break;
             default:
                 console.log(event.keyCode);
@@ -250,7 +266,7 @@ function initScene( name , gl , shaderProgram){
     cube.material.nPhongs(51.2);
 
     var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt( 0.75, -1,-0.75);
+    pyramid.positionAt( -0.75, 0.5,0);
     pyramid.material.kDiffuse(1,0,0);
 
     var floor = scene.addObject(floor_model.gl_model);
@@ -298,7 +314,6 @@ function initScene( name , gl , shaderProgram){
     light_source.positionAt(0,0.2,1.30);
     light_source.type(1);
     light_source.switchOn();
-    // light_source.switchRotYYOn();
     scene.addLightSource(light_source);
     return scene;
 }
@@ -339,9 +354,20 @@ function runWebGL() {
     var camera2= new Camera();
     camera2.positionAt(0,0,3);
     scener.addCamera(camera2);
+    scener.fieldofview = 35;
+    scener.far = 15;
+    scener.near = 0.5;
     //scener.drawScene(projectionType, primitiveType);
 
     //scenel.light_sources[0].switchOff();
+    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
+    scenel.addModel(frustum_model);
+    viewVolume = scenel.addObject(frustum_model.gl_model);
+    viewVolume.material.kAmbient(0.21,0.13,0.05);
+    viewVolume.material.kDiffuse(0.71,0.43,0.18);
+    viewVolume.material.kSpecular(0.39,0.27,0.17);
+    viewVolume.material.nPhongs(25.6);
+
     tick();
 
     outputInfos();

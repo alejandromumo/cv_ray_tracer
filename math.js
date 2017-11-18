@@ -282,3 +282,23 @@ function matrix_invert(M){
     return I;
 }
 
+
+// func
+function trig(teta, dependency, sen, cos)
+{
+    var result  = null;
+    var h = null;
+    if(sen)
+        h = dependency / Math.sin(teta);
+    if(cos)
+        h = dependency / Math.cos(teta);
+    
+    result = my_pitagoras(h, dependency);
+    return result;
+}
+
+function my_pitagoras(h,c1)
+{
+    return Math.sqrt(Math.pow(h,2) - Math.pow(c1,2));
+}
+

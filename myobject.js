@@ -29,8 +29,7 @@ class myObject{
 
         this.u_mvMatrix = mat4();
 
-        this.u_mvMatrix = mult( this.u_mvMatrix, 
-                              translationMatrix( this.tx, this.ty, this.tz ) );
+        this.u_mvMatrix = mult( this.u_mvMatrix,translationMatrix( this.tx, this.ty, this.tz ) );
                              
         this.u_mvMatrix = mult( this.u_mvMatrix,
                               rotationZZMatrix( this.angleZZ ) );
@@ -54,15 +53,18 @@ class myObject{
     {
 
         this.computeMvMatrix();
-        if( primitiveType == this.gl.LINE_LOOP ) {
-            
+        if(this.glmodel.model.name === "volume")
+        {
             var i;
-            for( i = this.glmodel.start; i < (this.glmodel.size / 3); i++ ) {
-            
-                this.gl.drawArrays( primitiveType, 3 * i, 3 ); 
+            printMatrix(this.u_mvMatrix);
+
+            for( i = this.glmodel.start; i < (this.glmodel.size / 2); i++ ) 
+            {
+                this.gl.drawArrays( this.gl.LINE_LOOP,i*3,3); 
             }
         }   
-        else {
+        else 
+        {
             this.gl.drawArrays(primitiveType, this.glmodel.start,
                           this.glmodel.size);       
         }   
