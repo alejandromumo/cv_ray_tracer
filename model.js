@@ -2789,8 +2789,14 @@ class Model{
 
 
         ];
-
         computeVertexNormals(view_volume.positionArray, view_volume.normalsArray);
         return view_volume;
+    }
+
+    static getRayModel(versor){
+        var ray_model = new Model("ray");
+        ray_model.positionArray = [0,0,0,versor[0],versor[1],versor[2]]
+        computeVertexNormals(ray_model.positionArray, ray_model.normalsArray);
+        return ray_model;
     }
 }

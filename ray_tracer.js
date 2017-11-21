@@ -149,52 +149,52 @@ function setEventListeners(){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
-                frustum.deltarotate(0,10,0);
+         //       frustum.deltarotate(0,10,0);
                 viewVolume.deltarotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
-                frustum.deltarotate(-10,0,0);
+          //      frustum.deltarotate(-10,0,0);
                 viewVolume.deltarotate(-10,0,0);
                 break;
             case 39: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
-                frustum.deltarotate(0,-10,0);
+            //    frustum.deltarotate(0,-10,0);
                 viewVolume.deltarotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
-                frustum.deltarotate(10,0,0);
+           //     frustum.deltarotate(10,0,0);
                 viewVolume.deltarotate(10,0,0);
                 break;
             case 87: // move front W
                 scener.camera.translate(0,0,-0.25);
-                frustum.translate(0,0,-0.25);
+           //     frustum.translate(0,0,-0.25);
                 viewVolume.translate(0,0,-0.25);
                 break;
             case 83: // move back S
                 scener.camera.translate(0,0,0.25);
-                frustum.translate(0,0,0.25);
+           //     frustum.translate(0,0,0.25);
                 viewVolume.translate(0,0,0.25);
                 break;
             case 73: // move UP
                 scener.camera.translate(0,0.25,0);
-                frustum.translate(0,0.25,0);
+           //     frustum.translate(0,0.25,0);
                 viewVolume.translate(0,0.25,0);
                 break;
             case 75: // move DOWN
                 scener.camera.translate(0,-0.25,0);
-                frustum.translate(0,-0.25,0);
+           //     frustum.translate(0,-0.25,0);
                 viewVolume.translate(0,-0.25,0);
                 break;
             case 65: // move LEFT A
                 scener.camera.translate(-0.25,0,0);
-                frustum.translate(-0.25,0,0);
+           //     frustum.translate(-0.25,0,0);
                 viewVolume.translate(-0.25,0,0);
                 break;
             case 68: // move RIGHT D
                 scener.camera.translate(0.25,0,0);
-                frustum.translate(0.25,0,0);
+           //     frustum.translate(0.25,0,0);
                 viewVolume.translate(0.25,0,0);
                 break;
             default:
@@ -202,6 +202,48 @@ function setEventListeners(){
                 break;
         }
     });
+
+    canvasr.addEventListener("mousedown", function(event){
+        var x = new Number();
+        var y = new Number();
+        var canvas = document.getElementById("canvasr");
+
+        if (event.x != undefined && event.y != undefined)
+        {
+            x = event.x;
+            y = event.y;
+        }
+        else // Firefox para o Manu
+        {
+            x = event.clientX + document.body.scrollLeft +
+            document.documentElement.scrollLeft;
+            y = event.clientY + document.body.scrollTop +
+            document.documentElement.scrollTop;
+        }
+        x -= canvas.offsetLeft;
+        y -= canvas.offsetTop;
+
+        var pX = (x+0.5)/350
+        var pY = (y+0.5)/350
+
+        pX = (2 * pX) -1
+        pY = 1 - (2* pY)
+
+        var ray = new Ray(  scener.camera.cameraPosition[0],
+                            scener.camera.cameraPosition[1],
+                            scener.camera.cameraPosition[2],
+                            pX, pY, scener.camera.cameraPosition[2]-(scener.far-scener.near))
+
+        ray.logRay()
+        var Ray_Model = Model.getRayModel(ray.dir);
+        console.log(Ray_Model)
+        scenel.addModel(Ray_Model)
+        var ray = scenel.addObject(Ray_Model.gl_model)
+        ray.positionAt( scener.camera.cameraPosition[0],
+                        scener.camera.cameraPosition[1],
+                        scener.camera.cameraPosition[2]);
+        ray.scale(100,100,100)
+    }, false)
 }
 
 function getRandomArbitrary(min, max) {
@@ -312,20 +354,20 @@ function initScene( name , gl , shaderProgram){
     // Criação da luz
     var light_source = new LightSource();
     light_source.positionAt(0,0.2,1.30);
-    light_source.type(0); // 1 -> omni , 0 -> directional
+    light_source.type(1); // 1 -> omni , 0 -> directional
     light_source.switchOn();
     scene.addLightSource(light_source);
     return scene;
 }
 
 function addFrustum(scene){
-    var pyramid_model = Model.getPyramidModel();
-    scene.addModel(pyramid_model);
-    var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt(-0.125,0.125,3.5);
-    pyramid.rotate(90,0,0);
-    pyramid.material.kDiffuse(0,0,1);
-    return pyramid
+    //var pyramid_model = Model.getPyramidModel();
+    //scene.addModel(pyramid_model);
+    //var pyramid = scene.addObject(pyramid_model.gl_model);
+    //pyramid.positionAt(-0.125,0.125,3.5);
+    //pyramid.rotate(90,0,0);
+    //pyramid.material.kDiffuse(0,0,1);
+    //return pyramid
 }
 
 //----------------------------------------------------------------------------
@@ -345,8 +387,9 @@ function runWebGL() {
     scenel = initScene("scene1", gll , shaderPrograml);
     frustum = addFrustum(scenel)
     var camera = new Camera();
-    camera.rotate(0,55,0);
-    camera.positionAt(5,0,5);
+    //camera.rotate(0,55,0)
+    camera.positionAt(0,0,6);
+    //camera.positionAt(0,0,6);
     scenel.addCamera(camera);
     //scenel.drawScene(projectionType, primitiveType);
 
@@ -355,7 +398,7 @@ function runWebGL() {
     camera2.positionAt(0,0,3);
     scener.addCamera(camera2);
     scener.fieldofview = 30;
-    scener.far = 5;
+    scener.far = 10;
     scener.near = 0.5;
     //scener.drawScene(projectionType, primitiveType);
 

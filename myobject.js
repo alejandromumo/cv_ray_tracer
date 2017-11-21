@@ -56,17 +56,23 @@ class myObject{
         if(this.glmodel.model.name === "view volume")
         {
             var i;
-            printMatrix(this.u_mvMatrix);
+            //printMatrix(this.u_mvMatrix);
             for( i = this.glmodel.start; i < this.glmodel.start + (this.glmodel.size - 2); i+=3) 
             {
                 this.gl.drawArrays( this.gl.LINE_LOOP,i,3); 
             }
-        }   
+        }
+        else if(this.glmodel.model.name === "ray")
+        {
+            console.log("Estou aqui")
+            this.gl.drawArrays( this.gl.LINES,this.glmodel.start,this.glmodel.size);
+
+        }
         else 
         {
             this.gl.drawArrays(primitiveType, this.glmodel.start,
-                          this.glmodel.size);       
-        }   
+                          this.glmodel.size);
+        }
     }
 
     scale(sx, sy, sz)

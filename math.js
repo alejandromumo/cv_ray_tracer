@@ -302,3 +302,9 @@ function my_pitagoras(h,c1)
     return Math.sqrt(Math.pow(h,2) - Math.pow(c1,2));
 }
 
+function normalize( v  ) {
+    var u = Math.sqrt( Math.pow(v[0],2)+Math.pow(v[1],2)+Math.pow(v[2],2)  )
+    v[0] = v[0]/u
+    v[1] = v[1]/u
+    v[2] = v[2]/u
+ }
