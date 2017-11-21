@@ -3,7 +3,6 @@
 
 var gll = null; // WebGL context
 var glr = null;
-var frustum = null; // pyramid representing right camera on left scene
 var viewVolume = null;
 
 var scenel = null;
@@ -18,6 +17,13 @@ var primitiveType = 2;
 
 // To allow choosing the projection type
 var projectionType = 1; // TODO ortogonal não funciona muito bem
+
+// Models
+var cube_model = null;
+var pyramid_model = null;
+var floor_model = null;
+var bck_model = null;
+var sphere_model = null;
 
 
 //----------------------------------------------------------------------------
@@ -56,13 +62,6 @@ function tick() {
 
     scener.drawScene(projectionType, primitiveType);
     scenel.drawScene(projectionType, primitiveType);
-}
-
-//
-//  User Interaction
-//
-
-function outputInfos(){
 }
 
 //----------------------------------------------------------------------------
@@ -188,10 +187,6 @@ function setEventListeners(){
     });
 }
 
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
 //----------------------------------------------------------------------------
 // WebGL Initialization
 
@@ -225,15 +220,31 @@ function initWebGL( canvas ) {
     }
 }
 
+//----------------------------------------------------------------------------
+// Scenes initialization
+function initScenes(canvasl, canvasr)
+{
+    // Initialize gl contexts and shader programs for each scene
+    glr = initWebGL(canvasr);
+    shaderProgramRight = initShaders(glr);
+    gll = initWebGL(canvasl);
+    shaderProgramLeft = initShaders(gll);
+
+    // Initialize available models
+    initModels();
+
+    // Initialize scenes and add models 
+    //  and common objects to each of them
+    scener = initScene("right scene", glr, shaderProgramRight);
+    scenel = initScene("left scene", gll, shaderProgramLeft);
+
+    // Populate each scene as desired
+    populateRightScene();
+    populateLeftScene();
+}
 
 function initScene( name , gl , shaderProgram){
     var scene = new Scene(name, gl, shaderProgram);
-
-    var cube_model = Model.getCubeModel();
-    var pyramid_model = Model.getPyramidModel();
-    var floor_model = Model.getFloorModel();
-    var bck_model = Model.getBackgroundModel();
-    var sphere_model = Model.getSphereModel();
 
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
@@ -256,11 +267,10 @@ function initScene( name , gl , shaderProgram){
     var floor = scene.addObject(floor_model.gl_model);
     floor.material.kDiffuse(1,1,1);
 
-    var ceiling = scene.addObject(floor_model.gl_model);
-    ceiling.material.kAmbient(0.21,0.13,0.05);
-    // +2 bcs floor model is defined at -1;
-    ceiling.rotate(0,0,180)
-    ceiling.positionAt(0,0,0);
+    // var ceiling = scene.addObject(floor_model.gl_model);
+    // ceiling.material.kAmbient(0.21,0.13,0.05);
+    // ceiling.rotate(0,0,180)
+    // ceiling.positionAt(0,0,0);
 
     var background = scene.addObject(bck_model.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
@@ -293,14 +303,70 @@ function initScene( name , gl , shaderProgram){
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
 
-    // Criação da luz
+    return scene;
+}
+
+function populateRightScene()
+{
+    // Add light to right scene
+    var light_source = new LightSource();
+    light_source.positionAt(0,0,0.5);
+    light_source.type(0); // 1 -> omni , 0 -> directional
+    light_source.switchOn();
+    scener.addLightSource(light_source);
+
+    // Add camera into right scene
+    var camera = new Camera();
+    camera.positionAt(0,0,3);
+    camera.lookAt(0,0,0);
+    scener.addCamera(camera);
+
+    // Perspective parameters for right scene
+    scener.fieldofview = 35;
+    scener.far = 10;
+    scener.near = 0.5;
+}
+
+function populateLeftScene()
+{
+    // Add light to left scene
     var light_source = new LightSource();
     light_source.positionAt(0,0.2,1.30);
     light_source.type(0); // 1 -> omni , 0 -> directional
     light_source.switchOn();
-    scene.addLightSource(light_source);
-    return scene;
+    scenel.addLightSource(light_source);
+
+    // Add camera to left scene
+    var camera = new Camera();
+    camera.rotate(10,40,0);
+    camera.positionAt(0,0,10);
+    camera.radius = 8;
+    scenel.addCamera(camera);
+
+    // Perspective parameters for left scene
+    scenel.fieldofview = 35;
+    scenel.far = 20;
+    scenel.near = 0.5;
+
+    // View Volume representing right scene view volume
+    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
+    scenel.addModel(frustum_model);
+    viewVolume = scenel.addObject(frustum_model.gl_model);
+    viewVolume.material.kAmbient(0.21,0.13,0.05);
+    viewVolume.material.kDiffuse(0.71,0.43,0.18);
+    viewVolume.material.kSpecular(0.39,0.27,0.17);
+    viewVolume.material.nPhongs(25.6);
 }
+
+function initModels()
+{
+    cube_model = Model.getCubeModel();
+    pyramid_model = Model.getPyramidModel();
+    floor_model = Model.getFloorModel();
+    bck_model = Model.getBackgroundModel();
+    sphere_model = Model.getSphereModel();
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -309,40 +375,11 @@ function runWebGL() {
     var canvasl = document.getElementById("canvasl");
     var canvasr = document.getElementById("canvasr");
 
-    gll = initWebGL( canvasl );
-    glr =initWebGL( canvasr );
-
-    shaderPrograml = initShaders( gll );
-    shaderProgramr = initShaders( glr );
+    initScenes(canvasl, canvasr);
 
     setEventListeners();
 
-    scenel = initScene("scene1", gll , shaderPrograml);
-    var camera = new Camera();
-    camera.rotate(10,40,0);
-    camera.positionAt(0,0,10);
-    scenel.addCamera(camera);
-
-    scener = initScene("scene2", glr , shaderProgramr);
-    var camera2= new Camera();
-    camera2.positionAt(0,0,3);
-    camera2.lookAt(0,1,0);
-    scener.addCamera(camera2);
-    scener.fieldofview = 35;
-    scener.far = 10;
-    scener.near = 0.5;
-
-    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
-    scenel.addModel(frustum_model);
-    viewVolume = scenel.addObject(frustum_model.gl_model);
-    viewVolume.material.kAmbient(0.21,0.13,0.05);
-    viewVolume.material.kDiffuse(0.71,0.43,0.18);
-    viewVolume.material.kSpecular(0.39,0.27,0.17);
-    viewVolume.material.nPhongs(25.6);
-
     tick();
-
-    outputInfos();
 }
 
 

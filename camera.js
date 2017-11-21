@@ -19,6 +19,8 @@ class Camera{
         this.up[2] = 0;
 
         this.print = 0;
+
+        this.radius = 6;
     }
 
     rotate(angleXX, angleYY, angleZZ)
@@ -60,7 +62,7 @@ class Camera{
         // this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.cameraPosition[0],this.cameraPosition[1],this.cameraPosition[2]));
         this.cameraMatrix = mult(this.cameraMatrix, rotationXXMatrix(this.angleXX));
         this.cameraMatrix = mult(this.cameraMatrix, rotationYYMatrix(this.angleYY));
-        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(0,0,6));
+        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(0,0,this.radius));
 
 
         this.cameraPosition[0] = this.cameraMatrix[0][3];
