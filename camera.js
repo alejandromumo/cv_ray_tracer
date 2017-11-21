@@ -50,39 +50,24 @@ class Camera{
         this.cameraPosition[2] = z;
     }
 
-    computeCameraMatrix()
+
+    computeViewMatrix()
     {
         this.cameraMatrix = mat4();
 
-        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.cameraPosition[0], this.cameraPosition[1], this.cameraPosition[2]));
-        this.cameraMatrix = mult(this.cameraMatrix, rotationZZMatrix(this.angleZZ));
-        this.cameraMatrix = mult(this.cameraMatrix, rotationYYMatrix(this.angleYY));
+
+
+        // this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.cameraPosition[0],this.cameraPosition[1],this.cameraPosition[2]));
         this.cameraMatrix = mult(this.cameraMatrix, rotationXXMatrix(this.angleXX));
-        
+        this.cameraMatrix = mult(this.cameraMatrix, rotationYYMatrix(this.angleYY));
+        this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(0,0,6));
+
 
         this.cameraPosition[0] = this.cameraMatrix[0][3];
         this.cameraPosition[1] = this.cameraMatrix[1][3];
         this.cameraPosition[2] = this.cameraMatrix[2][3];
 
-
-
-        // if(this.print < 2)
-        // {
-        //     console.log("camera position : " + this.cameraPosition);
-        //     console.log("target position: " + this.target);
-        //     console.log("up vector: " + this.up);
-        //     this.cameraMatrix = lookAt(this.cameraPosition, this.target, this.up);
-        //     // printMatrix(this.cameraMatrix);
-        //     this.print += 1;
-        // }
-        // else
-        //     this.cameraMatrix = lookAt(this.cameraPosition, this.target, this.up);
-
-    }
-
-    computeViewMatrix()
-    {
-        this.computeCameraMatrix();
+        this.cameraMatrix = lookAt_2(this.cameraPosition, this.target, this.up); // 
         this.viewMatrix = matrix_invert(this.cameraMatrix);
     }
 

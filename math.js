@@ -25,71 +25,9 @@ function radians( degrees ) {
 //  Generic Mathematical Operations for Vectors and Matrices
 //
 
-function equal( u, v )
-{
-    if ( u.length != v.length ) { return false; }
-   
-    if ( u.matrix && v.matrix ) {
-        for ( var i = 0; i < u.length; ++i ) {
-            if ( u[i].length != v[i].length ) { return false; }
-            for ( var j = 0; j < u[i].length; ++j ) {
-                if ( u[i][j] !== v[i][j] ) { return false; }
-            }
-        }
-    }
-    else if ( u.matrix && !v.matrix || !u.matrix && v.matrix ) {
-        return false;
-    }
-    else {
-        for ( var i = 0; i < u.length; ++i ) {
-            if ( u[i] !== v[i] ) { return false; }
-        }
-    }
-
-    return true;
-}
-
 //----------------------------------------------------------------------------
 
-function add( u, v )
-{
-    var result = [];
-
-    if ( u.matrix && v.matrix ) {
-        if ( u.length != v.length ) {
-            throw "add(): trying to add matrices of different dimensions";
-        }
-
-        for ( var i = 0; i < u.length; ++i ) {
-            if ( u[i].length != v[i].length ) {
-                throw "add(): trying to add matrices of different dimensions";
-            }
-            result.push( [] );
-            for ( var j = 0; j < u[i].length; ++j ) {
-                result[i].push( u[i][j] + v[i][j] );
-            }
-        }
-
-        result.matrix = true;
-
-        return result;
-    }
-    else if ( u.matrix && !v.matrix || !u.matrix && v.matrix ) {
-        throw "add(): trying to add matrix and non-matrix variables";
-    }
-    else {
-        if ( u.length != v.length ) {
-            throw "add(): vectors are not the same dimension";
-        }
-
-        for ( var i = 0; i < u.length; ++i ) {
-            result.push( u[i] + v[i] );
-        }
-
-        return result;
-    }
-}
-
+// 
 //----------------------------------------------------------------------------
 
 function subtract( u, v )
@@ -125,9 +63,10 @@ function subtract( u, v )
             throw "subtract(): vectors are not the same length";
         }
 
-        for ( var i = 0; i < u.length; ++i ) {
-            result.push( u[i] - v[i] );
-        }
+        result[0] = u[0] - v[0];
+        result[1] = u[1] - v[1];
+        result[2] = u[2] - v[2];
+
 
         return result;
     }

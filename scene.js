@@ -14,8 +14,8 @@ class Scene{
         this.pMatrix = mat4();
         this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
         this.near = 0.05;
-        this.far = 15;
-        this.fieldofview = 45;
+        this.far = 20;
+        this.fieldofview = 50;
 
         this.next_model_index = 0;
         this.model_vertices = [];
@@ -27,8 +27,10 @@ class Scene{
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // Computing the Projection Matrix
-        this.computeProjectionViewMatrix(projectionType);
+        this.computeProjectionMatrix(projectionType);
+        this.computeViewMatrix();
         this.computeViewerPosition();
+
         var l = this.light_sources[0];
         this.objects.forEach(function(myObject)
         {
@@ -38,21 +40,26 @@ class Scene{
         });
     }
 
-    computeProjectionViewMatrix(projectionType)
+    computeProjectionMatrix(projectionType)
     {
-        this.camera.computeViewMatrix();
-
         if( projectionType == 0 )
             this.pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
         else
             this.pMatrix = perspective( this.fieldofview, this.aspect, this.near, this.far );
 
-        this.pMatrix = mult(this.pMatrix, this.camera.viewMatrix);
-
-        var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uPMatrix");
+        var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uProjectionMatrix");
 
         this.gl.uniformMatrix4fv(pUniform, false,
                              new Float32Array(flatten(this.pMatrix)));
+    }
+
+    computeViewMatrix()
+    {
+        this.camera.computeViewMatrix();
+        var vUniform = this.gl.getUniformLocation(this.shaderProgram, "uCameraViewMatrix");
+
+        this.gl.uniformMatrix4fv(vUniform, false,
+                             new Float32Array(flatten(this.camera.viewMatrix)));
     }
 
     computeViewerPosition()

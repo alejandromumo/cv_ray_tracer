@@ -51,11 +51,11 @@ function animate( scene ) {
 function tick() {
     requestAnimFrame(tick);
 
-    animate( scenel );
     animate( scener );
+    animate( scenel );
 
-    scenel.drawScene(projectionType, primitiveType);
     scener.drawScene(projectionType, primitiveType);
+    scenel.drawScene(projectionType, primitiveType);
 }
 
 //
@@ -149,53 +149,37 @@ function setEventListeners(){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
-                frustum.deltarotate(0,10,0);
                 viewVolume.deltarotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
-                frustum.deltarotate(-10,0,0);
                 viewVolume.deltarotate(-10,0,0);
                 break;
             case 39: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
-                frustum.deltarotate(0,-10,0);
                 viewVolume.deltarotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
-                frustum.deltarotate(10,0,0);
                 viewVolume.deltarotate(10,0,0);
                 break;
             case 87: // move front W
-                scener.camera.translate(0,0,-0.25);
-                frustum.translate(0,0,-0.25);
-                viewVolume.translate(0,0,-0.25);
+                scenel.camera.deltaRotate(-10,0,0);
                 break;
             case 83: // move back S
-                scener.camera.translate(0,0,0.25);
-                frustum.translate(0,0,0.25);
-                viewVolume.translate(0,0,0.25);
-                break;
-            case 73: // move UP
-                scener.camera.translate(0,0.25,0);
-                frustum.translate(0,0.25,0);
-                viewVolume.translate(0,0.25,0);
-                break;
-            case 75: // move DOWN
-                scener.camera.translate(0,-0.25,0);
-                frustum.translate(0,-0.25,0);
-                viewVolume.translate(0,-0.25,0);
+                scenel.camera.deltaRotate(10,0,0);
                 break;
             case 65: // move LEFT A
-                scener.camera.translate(-0.25,0,0);
-                frustum.translate(-0.25,0,0);
-                viewVolume.translate(-0.25,0,0);
+                scenel.camera.deltaRotate(0,10,0);
                 break;
             case 68: // move RIGHT D
-                scener.camera.translate(0.25,0,0);
-                frustum.translate(0.25,0,0);
-                viewVolume.translate(0.25,0,0);
+                scenel.camera.deltaRotate(0,-10,0);
+                break;
+            case 13:
+                console.log("Scene right: ");
+                console.log(scener);
+                console.log("Scene left: ");
+                console.log(scenel);
                 break;
             default:
                 console.log(event.keyCode);
@@ -225,11 +209,11 @@ function initWebGL( canvas ) {
 
         // DEFAULT: Face culling is DISABLED
         // Enable FACE CULLING
-        //gl.enable( gl.CULL_FACE );
+        // gl.enable( gl.CULL_FACE );
 
         // DEFAULT: The BACK FACE is culled!!
         // The next instruction is not needed...
-        //gl.cullFace( gl.BACK );
+        // gl.cullFace( gl.BACK );
 
         // Enable DEPTH-TEST
         gl.enable( gl.DEPTH_TEST );
@@ -318,15 +302,6 @@ function initScene( name , gl , shaderProgram){
     return scene;
 }
 
-function addFrustum(scene){
-    var pyramid_model = Model.getPyramidModel();
-    scene.addModel(pyramid_model);
-    var pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt(-0.125,0.125,3.5);
-    pyramid.rotate(90,0,0);
-    pyramid.material.kDiffuse(0,0,1);
-    return pyramid
-}
 
 //----------------------------------------------------------------------------
 
@@ -343,23 +318,20 @@ function runWebGL() {
     setEventListeners();
 
     scenel = initScene("scene1", gll , shaderPrograml);
-    frustum = addFrustum(scenel)
     var camera = new Camera();
-    camera.rotate(0,55,0);
-    camera.positionAt(5,0,5);
+    camera.rotate(10,40,0);
+    camera.positionAt(0,0,10);
     scenel.addCamera(camera);
-    //scenel.drawScene(projectionType, primitiveType);
 
     scener = initScene("scene2", glr , shaderProgramr);
     var camera2= new Camera();
     camera2.positionAt(0,0,3);
+    camera2.lookAt(0,1,0);
     scener.addCamera(camera2);
-    scener.fieldofview = 30;
-    scener.far = 5;
+    scener.fieldofview = 35;
+    scener.far = 10;
     scener.near = 0.5;
-    //scener.drawScene(projectionType, primitiveType);
 
-    //scenel.light_sources[0].switchOff();
     var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
     scenel.addModel(frustum_model);
     viewVolume = scenel.addObject(frustum_model.gl_model);
