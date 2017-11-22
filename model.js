@@ -2793,9 +2793,9 @@ class Model{
         return view_volume;
     }
 
-    static getRayModel(versor){
+    static getRayModel(versor, size){
         var ray_model = new Model("ray");
-        ray_model.positionArray = [0,0,0,versor[0],versor[1],versor[2]]
+        ray_model.positionArray = [0,0,0,versor[0]*size,versor[1]*size,versor[2]*size]
         computeVertexNormals(ray_model.positionArray, ray_model.normalsArray);
         return ray_model;
     }

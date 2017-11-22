@@ -216,17 +216,16 @@ function setEventListeners(){
         var ray = new Ray(  scener.camera.cameraPosition[0],
                             scener.camera.cameraPosition[1],
                             scener.camera.cameraPosition[2],
-                            10, 44.46, -7)
-
+                            1, 1, 1)
         ray.logRay()
-        var Ray_Model = Model.getRayModel(ray.dir);
+        var Ray_Model = Model.getRayModel(ray.dir, ray.size);
         console.log(Ray_Model)
         scenel.addModel(Ray_Model)
         var ray = scenel.addObject(Ray_Model.gl_model)
         ray.scale(1,1,1)
-        //ray.positionAt( scener.camera.cameraPosition[0],
-        //                scener.camera.cameraPosition[1],
-        //                scener.camera.cameraPosition[2]);
+        ray.positionAt( scener.camera.cameraPosition[0],
+                        scener.camera.cameraPosition[1],
+                        scener.camera.cameraPosition[2]);
     }, false)
 }
 
@@ -359,14 +358,14 @@ function populateRightScene()
 
     // Add camera into right scene
     var camera = new Camera();
-    camera.positionAt(0,0,9);
+    camera.radius = 4;
     camera.lookAt(0,0,0);
     scener.addCamera(camera);
 
     // Perspective parameters for right scene
     scener.fieldofview = 35;
     scener.far = 10;
-    scener.near = 0.5;
+    scener.near = 1;
 }
 
 function populateLeftScene()
@@ -391,13 +390,13 @@ function populateLeftScene()
     scenel.near = 0.5;
 
     // View Volume representing right scene view volume
-    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
-    scenel.addModel(frustum_model);
-    viewVolume = scenel.addObject(frustum_model.gl_model);
-    viewVolume.material.kAmbient(0.21,0.13,0.05);
-    viewVolume.material.kDiffuse(0.71,0.43,0.18);
-    viewVolume.material.kSpecular(0.39,0.27,0.17);
-    viewVolume.material.nPhongs(25.6);
+    //var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
+    //scenel.addModel(frustum_model);
+    //viewVolume = scenel.addObject(frustum_model.gl_model);
+    //viewVolume.material.kAmbient(0.21,0.13,0.05);
+    //viewVolume.material.kDiffuse(0.71,0.43,0.18);
+    //viewVolume.material.kSpecular(0.39,0.27,0.17);
+    //viewVolume.material.nPhongs(25.6);
 }
 
 function initModels()
