@@ -176,10 +176,11 @@ function setEventListeners(){
                 scenel.camera.deltaRotate(0,-10,0);
                 break;
             case 13:
-                console.log("Scene right: ");
-                console.log(scener);
-                console.log("Scene left: ");
-                console.log(scenel);
+                //console.log("Scene right: ");
+                //console.log(scener);
+                //console.log("Scene left: ");
+                //console.log(scenel);
+                console.log(scener.camera.viewMatrix)
                 break;
             default:
                 console.log(event.keyCode);
@@ -207,16 +208,32 @@ function setEventListeners(){
         x -= canvas.offsetLeft;
         y -= canvas.offsetTop;
 
-        var pX = (x+0.5)/350
-        var pY = (y+0.5)/350
+        var pX = x - (350/2)
+        var pY = (350/2)-y
+        var pZ = -(350/2)/( Math.tan( radians(35) / 2))
 
-        pX = (2 * pX) -1
-        pY = 1 - (2* pY)
+        var dir = vec4()
+        dir[0]=pX
+        dir[1]=pY
+        dir[2]=pZ
+        console.log(dir)
 
+        var xD = mult(dir, scener.camera.viewMatrix)
+        console.log(xD)
         var ray = new Ray(  scener.camera.cameraPosition[0],
                             scener.camera.cameraPosition[1],
                             scener.camera.cameraPosition[2],
-                            1, 1, 1)
+                            pX,pY,pZ)
+
+        //// Convert the Raster Space to NDC
+        //pX = (x+0.5) / 350
+        //pY = (y+0.5) / 350
+
+        //// Convert the NDC to Screen Space
+        //pX = 2*pX -1
+        //pY = 1- (2* pY)
+
+        // Convert
         ray.logRay()
         var Ray_Model = Model.getRayModel(ray.dir, ray.size);
         console.log(Ray_Model)
@@ -379,24 +396,26 @@ function populateLeftScene()
 
     // Add camera to left scene
     var camera = new Camera();
-    camera.rotate(10,40,0);
-    camera.positionAt(0,0,10);
-    camera.radius = 10;
+    //camera.rotate(10,40,0);
+    //camera.positionAt(0,0,10);
+    camera.lookAt(0,0,0);
+    camera.radius = 6;
     scenel.addCamera(camera);
 
     // Perspective parameters for left scene
     scenel.fieldofview = 35;
-    scenel.far = 20;
-    scenel.near = 0.5;
+    scenel.far = 10;
+    scenel.near = 1;
 
     // View Volume representing right scene view volume
-    //var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
-    //scenel.addModel(frustum_model);
-    //viewVolume = scenel.addObject(frustum_model.gl_model);
-    //viewVolume.material.kAmbient(0.21,0.13,0.05);
-    //viewVolume.material.kDiffuse(0.71,0.43,0.18);
-    //viewVolume.material.kSpecular(0.39,0.27,0.17);
-    //viewVolume.material.nPhongs(25.6);
+//    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
+//    scenel.addModel(frustum_model);
+//    viewVolume = scenel.addObject(frustum_model.gl_model);
+//    viewVolume.positionAt(0,0,3)
+//    viewVolume.material.kAmbient(0.21,0.13,0.05);
+//    viewVolume.material.kDiffuse(0.71,0.43,0.18);
+//    viewVolume.material.kSpecular(0.39,0.27,0.17);
+//    viewVolume.material.nPhongs(25.6);
 }
 
 function initModels()
