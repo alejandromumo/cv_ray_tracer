@@ -208,22 +208,24 @@ function setEventListeners(){
         x -= canvas.offsetLeft;
         y -= canvas.offsetTop;
 
-        var pX = x - (350/2)
-        var pY = (350/2)-y
-        var pZ = -(350/2)/( Math.tan( radians(35) / 2))
+        var d = vec4()
+        d[0] = x - (350/2)
+        d[1] = (350/2)-y
+        d[2] = -(350/2)/( Math.tan( radians(35) / 2))
+
+        console.log(d)
+
+        var vM = scener.camera.viewMatrix
+        console.log(vM)
 
         var dir = vec4()
-        dir[0]=pX
-        dir[1]=pY
-        dir[2]=pZ
+        dir = multiplyVectorByMatrix(matrix_invert(vM),d)
         console.log(dir)
 
-        var xD = mult(dir, scener.camera.viewMatrix)
-        console.log(xD)
         var ray = new Ray(  scener.camera.cameraPosition[0],
                             scener.camera.cameraPosition[1],
                             scener.camera.cameraPosition[2],
-                            pX,pY,pZ)
+                            dir[0],dir[1],dir[2])
 
         //// Convert the Raster Space to NDC
         //pX = (x+0.5) / 350

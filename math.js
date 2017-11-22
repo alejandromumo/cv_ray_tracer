@@ -247,3 +247,15 @@ function normalize( v  ) {
     v[1] = v[1]/u
     v[2] = v[2]/u
  }
+
+function multiplyVectorByMatrix( m, p )
+{
+    console.log("xDDD")
+    var result = vec4();
+    for( var i = 0; i < 4; i++  ) {
+        for( var j = 0; j < 4; j++  ) {     // Can stop earlier; 4th coord is ZERO !!
+            result[i] += m[i][j] * p[j];
+        }
+    }
+    return result;
+}
