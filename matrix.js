@@ -97,49 +97,88 @@ function mat4()
     return m;
 }
 
-function array_to_mat4(a)
-{
-    var matrix4 = mat4();
-    var idx = 0;
-    for (var i = 0; i < a.length; i++) {
-        idx = i % 4;
-        for (var j = 0; j < 4; j++) {
-            matrix4[idx][j] = a[i];
-        }
-    }
-
-    return matrix4;
-}
 
 function lookAt(cameraPosition, target, up)
 {
-    var zAxis = subtract(target, cameraPosition);
-    zAxis = mult(zAxis, [-1,-1,-1]);
+    var zAxis = subtract(cameraPosition,target);
     normalize(zAxis);
     var xAxis = vectorProduct(up, zAxis);
     normalize(xAxis);
-    var yAxis = vectorProduct(zAxis, xAxis);
+    var yAxis = vectorProduct(zAxis,xAxis);
 
     var cameraMatrix = mat4();
+
+    // |------------------------------------------
+    // | xAxis.x | xAxis.y | xAxis.z | camera.x |
+    // |---------|---------|---------|-----------|
+    // | yAxis.x | yAxis.y | yAxis.z | camera.y |
+    // |---------|---------|---------|-----------|
+    // | zAxis.x | zAxis.y | zAxis.z | camera.z |
+    // |---------|---------|---------|-----------|
+    // | 0       | 0       | 0       |    1      |
+    // |-----------------------------------------|
 
     cameraMatrix[0][0] = xAxis[0];
     cameraMatrix[0][1] = xAxis[1];
     cameraMatrix[0][2] = xAxis[2];
-    cameraMatrix[0][3] = dotProduct(xAxis, cameraPosition);
-    // cameraMatrix[0][3] = cameraPosition[0];
+    cameraMatrix[0][3] = cameraPosition[0];
 
 
     cameraMatrix[1][0] = yAxis[0];
     cameraMatrix[1][1] = yAxis[1];
     cameraMatrix[1][2] = yAxis[2];
-    cameraMatrix[1][3] = dotProduct(yAxis, cameraPosition);
-    // cameraMatrix[1][3] = cameraPosition[1];
+    cameraMatrix[1][3] = cameraPosition[1];
 
     cameraMatrix[2][0] = zAxis[0];
     cameraMatrix[2][1] = zAxis[1];
     cameraMatrix[2][2] = zAxis[2];
-    cameraMatrix[2][3] = dotProduct(zAxis, cameraPosition);
-    // cameraMatrix[2][3] = cameraPosition[2];
+    cameraMatrix[2][3] = cameraPosition[2];
+
+
+    cameraMatrix[3][0] = 0;
+    cameraMatrix[3][1] = 0;
+    cameraMatrix[3][2] = 0;
+    cameraMatrix[3][3] = 1;
+
+    return cameraMatrix;
+}
+
+function lookAt_2(cameraPosition, target, up)
+{
+    var zAxis = subtract(cameraPosition,target);
+    normalize(zAxis);
+    var xAxis = vectorProduct(up, zAxis);
+    normalize(xAxis);
+    var yAxis = vectorProduct(zAxis,xAxis);
+
+    var cameraMatrix = mat4();
+
+    // |------------------------------------------
+    // | xAxis.x | yAxis.x | zAxis.x | camera.x |
+    // |---------|---------|---------|-----------|
+    // | xAxis.y | yAxis.y | zAxis.y | camera.y |
+    // |---------|---------|---------|-----------|
+    // | xAxis.z | yAxis.z | zAxis.z | camera.z |
+    // |---------|---------|---------|-----------|
+    // | 0       | 0       | 0       |    1      |
+    // |-----------------------------------------|
+
+    cameraMatrix[0][0] = xAxis[0];
+    cameraMatrix[1][0] = xAxis[1];
+    cameraMatrix[2][0] = xAxis[2];
+
+    
+    cameraMatrix[0][1] = yAxis[0];
+    cameraMatrix[1][1] = yAxis[1];
+    cameraMatrix[2][1] = yAxis[2];
+
+    cameraMatrix[0][2] = zAxis[0];
+    cameraMatrix[1][2] = zAxis[1];
+    cameraMatrix[2][2] = zAxis[2];
+
+    cameraMatrix[0][3] = cameraPosition[0];
+    cameraMatrix[1][3] = cameraPosition[1];
+    cameraMatrix[2][3] = cameraPosition[2];
 
 
     cameraMatrix[3][0] = 0;

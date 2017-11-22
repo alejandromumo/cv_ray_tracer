@@ -6,9 +6,6 @@ class myObject{
         this.gl = gl;
         this.shaderProgram = shaderProgram;
 
-        // this.localMatrix = mat4(); TODO
-        // this.worldMatrix = mat4(); TODO
-
         this.tx = 0;
         this.ty = 0;
         this.tz = 0;
@@ -31,14 +28,15 @@ class myObject{
 
         this.u_mvMatrix = mult( this.u_mvMatrix,translationMatrix( this.tx, this.ty, this.tz ) );
                              
-        this.u_mvMatrix = mult( this.u_mvMatrix,
-                              rotationZZMatrix( this.angleZZ ) );
+        this.u_mvMatrix = mult( this.u_mvMatrix, 
+                              rotationXXMatrix( this.angleXX ) );
         
         this.u_mvMatrix = mult( this.u_mvMatrix, 
                               rotationYYMatrix( this.angleYY ) );
         
-        this.u_mvMatrix = mult( this.u_mvMatrix, 
-                              rotationXXMatrix( this.angleXX ) );
+        
+        this.u_mvMatrix = mult( this.u_mvMatrix,
+                              rotationZZMatrix( this.angleZZ ) );
         
         this.u_mvMatrix = mult( this.u_mvMatrix, 
                               scalingMatrix( this.sx, this.sy, this.sz ) );
@@ -56,7 +54,6 @@ class myObject{
         if(this.glmodel.model.name === "view volume")
         {
             var i;
-            //printMatrix(this.u_mvMatrix);
             for( i = this.glmodel.start; i < this.glmodel.start + (this.glmodel.size - 2); i+=3) 
             {
                 this.gl.drawArrays( this.gl.LINE_LOOP,i,3); 
@@ -108,6 +105,15 @@ class myObject{
         this.tx = tx;
         this.ty = ty;
         this.tz = tz;
+    }
+
+
+    positionAts(v)
+    {
+
+        this.tx = v[0];
+        this.ty = v[1];
+        this.tz = v[2];
     }
 
     computeLight(lightSource)

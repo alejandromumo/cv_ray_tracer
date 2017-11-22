@@ -3,7 +3,6 @@
 
 var gll = null; // WebGL context
 var glr = null;
-var frustum = null; // pyramid representing right camera on left scene
 var viewVolume = null;
 
 var scenel = null;
@@ -18,6 +17,13 @@ var primitiveType = 2;
 
 // To allow choosing the projection type
 var projectionType = 1; // TODO ortogonal não funciona muito bem
+
+// Models
+var cube_model = null;
+var pyramid_model = null;
+var floor_model = null;
+var bck_model = null;
+var sphere_model = null;
 
 
 //----------------------------------------------------------------------------
@@ -51,18 +57,11 @@ function animate( scene ) {
 function tick() {
     requestAnimFrame(tick);
 
-    animate( scenel );
     animate( scener );
+    animate( scenel );
 
-    scenel.drawScene(projectionType, primitiveType);
     scener.drawScene(projectionType, primitiveType);
-}
-
-//
-//  User Interaction
-//
-
-function outputInfos(){
+    scenel.drawScene(projectionType, primitiveType);
 }
 
 //----------------------------------------------------------------------------
@@ -149,53 +148,38 @@ function setEventListeners(){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
-         //       frustum.deltarotate(0,10,0);
                 viewVolume.deltarotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
-          //      frustum.deltarotate(-10,0,0);
+
                 viewVolume.deltarotate(-10,0,0);
                 break;
             case 39: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
-            //    frustum.deltarotate(0,-10,0);
                 viewVolume.deltarotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
-           //     frustum.deltarotate(10,0,0);
                 viewVolume.deltarotate(10,0,0);
                 break;
             case 87: // move front W
-                scener.camera.translate(0,0,-0.25);
-           //     frustum.translate(0,0,-0.25);
-                viewVolume.translate(0,0,-0.25);
+                scenel.camera.deltaRotate(-10,0,0);
                 break;
             case 83: // move back S
-                scener.camera.translate(0,0,0.25);
-           //     frustum.translate(0,0,0.25);
-                viewVolume.translate(0,0,0.25);
-                break;
-            case 73: // move UP
-                scener.camera.translate(0,0.25,0);
-           //     frustum.translate(0,0.25,0);
-                viewVolume.translate(0,0.25,0);
-                break;
-            case 75: // move DOWN
-                scener.camera.translate(0,-0.25,0);
-           //     frustum.translate(0,-0.25,0);
-                viewVolume.translate(0,-0.25,0);
+                scenel.camera.deltaRotate(10,0,0);
                 break;
             case 65: // move LEFT A
-                scener.camera.translate(-0.25,0,0);
-           //     frustum.translate(-0.25,0,0);
-                viewVolume.translate(-0.25,0,0);
+                scenel.camera.deltaRotate(0,10,0);
                 break;
             case 68: // move RIGHT D
-                scener.camera.translate(0.25,0,0);
-           //     frustum.translate(0.25,0,0);
-                viewVolume.translate(0.25,0,0);
+                scenel.camera.deltaRotate(0,-10,0);
+                break;
+            case 13:
+                console.log("Scene right: ");
+                console.log(scener);
+                console.log("Scene left: ");
+                console.log(scenel);
                 break;
             default:
                 console.log(event.keyCode);
@@ -232,22 +216,18 @@ function setEventListeners(){
         var ray = new Ray(  scener.camera.cameraPosition[0],
                             scener.camera.cameraPosition[1],
                             scener.camera.cameraPosition[2],
-                            pX, pY, scener.camera.cameraPosition[2]-(scener.far-scener.near))
+                            10, 44.46, -7)
 
         ray.logRay()
         var Ray_Model = Model.getRayModel(ray.dir);
         console.log(Ray_Model)
         scenel.addModel(Ray_Model)
         var ray = scenel.addObject(Ray_Model.gl_model)
-        ray.positionAt( scener.camera.cameraPosition[0],
-                        scener.camera.cameraPosition[1],
-                        scener.camera.cameraPosition[2]);
-        ray.scale(100,100,100)
+        ray.scale(1,1,1)
+        //ray.positionAt( scener.camera.cameraPosition[0],
+        //                scener.camera.cameraPosition[1],
+        //                scener.camera.cameraPosition[2]);
     }, false)
-}
-
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
 }
 
 //----------------------------------------------------------------------------
@@ -267,11 +247,11 @@ function initWebGL( canvas ) {
 
         // DEFAULT: Face culling is DISABLED
         // Enable FACE CULLING
-        //gl.enable( gl.CULL_FACE );
+        // gl.enable( gl.CULL_FACE );
 
         // DEFAULT: The BACK FACE is culled!!
         // The next instruction is not needed...
-        //gl.cullFace( gl.BACK );
+        // gl.cullFace( gl.BACK );
 
         // Enable DEPTH-TEST
         gl.enable( gl.DEPTH_TEST );
@@ -283,15 +263,31 @@ function initWebGL( canvas ) {
     }
 }
 
+//----------------------------------------------------------------------------
+// Scenes initialization
+function initScenes(canvasl, canvasr)
+{
+    // Initialize gl contexts and shader programs for each scene
+    glr = initWebGL(canvasr);
+    shaderProgramRight = initShaders(glr);
+    gll = initWebGL(canvasl);
+    shaderProgramLeft = initShaders(gll);
+
+    // Initialize available models
+    initModels();
+
+    // Initialize scenes and add models 
+    //  and common objects to each of them
+    scener = initScene("right scene", glr, shaderProgramRight);
+    scenel = initScene("left scene", gll, shaderProgramLeft);
+
+    // Populate each scene as desired
+    populateRightScene();
+    populateLeftScene();
+}
 
 function initScene( name , gl , shaderProgram){
     var scene = new Scene(name, gl, shaderProgram);
-
-    var cube_model = Model.getCubeModel();
-    var pyramid_model = Model.getPyramidModel();
-    var floor_model = Model.getFloorModel();
-    var bck_model = Model.getBackgroundModel();
-    var sphere_model = Model.getSphereModel();
 
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
@@ -314,11 +310,10 @@ function initScene( name , gl , shaderProgram){
     var floor = scene.addObject(floor_model.gl_model);
     floor.material.kDiffuse(1,1,1);
 
-    var ceiling = scene.addObject(floor_model.gl_model);
-    ceiling.material.kAmbient(0.21,0.13,0.05);
-    // +2 bcs floor model is defined at -1;
-    ceiling.rotate(0,0,180)
-    ceiling.positionAt(0,0,0);
+    // var ceiling = scene.addObject(floor_model.gl_model);
+    // ceiling.material.kAmbient(0.21,0.13,0.05);
+    // ceiling.rotate(0,0,180)
+    // ceiling.positionAt(0,0,0);
 
     var background = scene.addObject(bck_model.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
@@ -350,59 +345,52 @@ function initScene( name , gl , shaderProgram){
     sphere.material.kSpecular(0.39,0.27,0.17);
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
-
-    // Criação da luz
-    var light_source = new LightSource();
-    light_source.positionAt(0,0.2,1.30);
-    light_source.type(1); // 1 -> omni , 0 -> directional
-    light_source.switchOn();
-    scene.addLightSource(light_source);
     return scene;
 }
 
-function addFrustum(scene){
-    //var pyramid_model = Model.getPyramidModel();
-    //scene.addModel(pyramid_model);
-    //var pyramid = scene.addObject(pyramid_model.gl_model);
-    //pyramid.positionAt(-0.125,0.125,3.5);
-    //pyramid.rotate(90,0,0);
-    //pyramid.material.kDiffuse(0,0,1);
-    //return pyramid
-}
+function populateRightScene()
+{
+    // Add light to right scene
+    var light_source = new LightSource();
+    light_source.positionAt(0,0,0.5);
+    light_source.type(0); // 1 -> omni , 0 -> directional
+    light_source.switchOn();
+    scener.addLightSource(light_source);
 
-//----------------------------------------------------------------------------
-
-function runWebGL() {
-    var canvasl = document.getElementById("canvasl");
-    var canvasr = document.getElementById("canvasr");
-
-    gll = initWebGL( canvasl );
-    glr =initWebGL( canvasr );
-
-    shaderPrograml = initShaders( gll );
-    shaderProgramr = initShaders( glr );
-
-    setEventListeners();
-
-    scenel = initScene("scene1", gll , shaderPrograml);
-    frustum = addFrustum(scenel)
+    // Add camera into right scene
     var camera = new Camera();
-    //camera.rotate(0,55,0)
-    camera.positionAt(0,0,6);
-    //camera.positionAt(0,0,6);
-    scenel.addCamera(camera);
-    //scenel.drawScene(projectionType, primitiveType);
+    camera.positionAt(0,0,9);
+    camera.lookAt(0,0,0);
+    scener.addCamera(camera);
 
-    scener = initScene("scene2", glr , shaderProgramr);
-    var camera2= new Camera();
-    camera2.positionAt(0,0,3);
-    scener.addCamera(camera2);
-    scener.fieldofview = 30;
+    // Perspective parameters for right scene
+    scener.fieldofview = 35;
     scener.far = 10;
     scener.near = 0.5;
-    //scener.drawScene(projectionType, primitiveType);
+}
 
-    //scenel.light_sources[0].switchOff();
+function populateLeftScene()
+{
+    // Add light to left scene
+    var light_source = new LightSource();
+    light_source.positionAt(0,0.2,1.30);
+    light_source.type(0); // 1 -> omni , 0 -> directional
+    light_source.switchOn();
+    scenel.addLightSource(light_source);
+
+    // Add camera to left scene
+    var camera = new Camera();
+    camera.rotate(10,40,0);
+    camera.positionAt(0,0,10);
+    camera.radius = 10;
+    scenel.addCamera(camera);
+
+    // Perspective parameters for left scene
+    scenel.fieldofview = 35;
+    scenel.far = 20;
+    scenel.near = 0.5;
+
+    // View Volume representing right scene view volume
     var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
     scenel.addModel(frustum_model);
     viewVolume = scenel.addObject(frustum_model.gl_model);
@@ -410,10 +398,30 @@ function runWebGL() {
     viewVolume.material.kDiffuse(0.71,0.43,0.18);
     viewVolume.material.kSpecular(0.39,0.27,0.17);
     viewVolume.material.nPhongs(25.6);
+}
+
+function initModels()
+{
+    cube_model = Model.getCubeModel();
+    pyramid_model = Model.getPyramidModel();
+    floor_model = Model.getFloorModel();
+    bck_model = Model.getBackgroundModel();
+    sphere_model = Model.getSphereModel();
+}
+
+
+
+//----------------------------------------------------------------------------
+
+function runWebGL() {
+    var canvasl = document.getElementById("canvasl");
+    var canvasr = document.getElementById("canvasr");
+
+    initScenes(canvasl, canvasr);
+
+    setEventListeners();
 
     tick();
-
-    outputInfos();
 }
 
 
