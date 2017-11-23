@@ -209,9 +209,9 @@ function setEventListeners(){
         y -= canvas.offsetTop;
 
         var d = vec4()
-        d[0] = x - (350/2)
-        d[1] = (350/2)-y
-        d[2] = -(350/2)/( Math.tan( radians(35) / 2))
+        d[0] = x - (canvas.width/2)
+        d[1] = (canvas.height/2)-y
+        d[2] = -(canvas.height/2)/( Math.tan( radians(scener.fieldofview) / 2))
 
         console.log(d)
 
