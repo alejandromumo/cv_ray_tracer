@@ -227,25 +227,13 @@ function setEventListeners(){
                             scener.camera.cameraPosition[2],
                             dir[0],dir[1],dir[2])
 
-        //// Convert the Raster Space to NDC
-        //pX = (x+0.5) / 350
-        //pY = (y+0.5) / 350
 
-        //// Convert the NDC to Screen Space
-        //pX = 2*pX -1
-        //pY = 1- (2* pY)
+        ray.drawRay(scenel,
+                    scener.camera.cameraPosition[0],
+                    scener.camera.cameraPosition[1],
+                    scener.camera.cameraPosition[2])
 
-        // Convert
-        ray.logRay()
-        var Ray_Model = Model.getRayModel(ray.dir, ray.size);
-        console.log(Ray_Model)
-        scenel.addModel(Ray_Model)
-        var ray = scenel.addObject(Ray_Model.gl_model)
-        ray.scale(1,1,1)
-        ray.positionAt( scener.camera.cameraPosition[0],
-                        scener.camera.cameraPosition[1],
-                        scener.camera.cameraPosition[2]);
-    }, false)
+            }, false)
 }
 
 //----------------------------------------------------------------------------
