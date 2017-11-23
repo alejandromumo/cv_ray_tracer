@@ -67,83 +67,6 @@ function tick() {
 //----------------------------------------------------------------------------
 
 function setEventListeners(){
-
-    // OBJ File loading
-    document.getElementById("obj-file").onchange = function(){
-        var file = this.files[0];
-        var obj_model = Model.getFromFile(file)
-        // console.log(obj_model);
-   }
-
-
-    // Adapted from:
-    // http://stackoverflow.com/questions/23331546/how-to-use-javascript-to-read-local-text-file-and-read-line-by-line
-    document.getElementById("file").onchange = function(){
-        var file = this.files[0];
-        var reader = new FileReader();
-        reader.onload = function( progressEvent ){
-            // Entire file read as a string
-            // The tokens/values in the file
-            // Separation between values is 1 or mode whitespaces
-
-            var tokens = this.result.split(/\s\s*/);
-            // Array of values; each value is a string
-            var numVertices = parseInt( tokens[0] );
-            // For every vertex we have 3 floating point values
-            var i, j;
-            var aux = 1;
-            var newVertices = [];
-            for( i = 0; i < numVertices; i++ ) {
-                for( j = 0; j < 3; j++ ) {
-                    newVertices[ 3 * i + j ] = parseFloat( tokens[ aux++ ] );
-                }
-            }
-
-            // Assigning to the current model
-            vertices += newVertices.slice();
-            computeVertexNormals( vertices, normals );
-
-            // To render the model just read
-            initBuffers();
-
-            // RESET the transformations - NEED AUXILIARY FUNCTION !!
-            tx = ty = tz = 0.0;
-
-            angleXX = angleYY = angleZZ = 0.0;
-
-            sx = sy = sz = 0.5;
-        };
-
-        // Entire file read as a string
-        reader.readAsText( file );
-    }
-
-    // Dropdown list
-    var list = document.getElementById("rendering-mode-selection");
-    list.addEventListener("click", function(){
-        // Getting the selection
-        var mode = list.selectedIndex;
-        switch(mode){
-            case 0 : primitiveType = scenel.gl.TRIANGLES;
-                break;
-            case 1 : primitiveType = scenel.gl.LINE_LOOP;
-                break;
-            case 2 : primitiveType = scenel.gl.POINTS;
-                break;
-        }
-    });
-
-    var cube_button = document.getElementById("add-cube");
-    cube_button.addEventListener("click",function(){
-        scene.camera.deltaRotate(0,15,0);
-    });
-
-    var sphere_button = document.getElementById("add-pyramid");
-    sphere_button.addEventListener("click",function(){
-        scene.camera.deltaRotate(0,-15,0);
-    });
-
-
     document.addEventListener('keydown', function(event){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
@@ -192,35 +115,21 @@ function setEventListeners(){
         var x = new Number();
         var y = new Number();
         var canvas = document.getElementById("canvasr");
+        var rect = canvas.getBoundingClientRect()
 
-        if (event.x != undefined && event.y != undefined)
-        {
-            x = event.x;
-            y = event.y;
-        }
-        else // Firefox para o Manu
-        {
-            x = event.clientX + document.body.scrollLeft +
-            document.documentElement.scrollLeft;
-            y = event.clientY + document.body.scrollTop +
-            document.documentElement.scrollTop;
-        }
-        x -= canvas.offsetLeft;
-        y -= canvas.offsetTop;
+        x = (event.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
+        y = (event.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
 
         var d = vec4()
         d[0] = x - (canvas.width/2)
         d[1] = (canvas.height/2)-y
         d[2] = -(canvas.height/2)/( Math.tan( radians(scener.fieldofview) / 2))
 
-        console.log(d)
 
         var vM = scener.camera.viewMatrix
-        console.log(vM)
 
         var dir = vec4()
         dir = multiplyVectorByMatrix(matrix_invert(vM),d)
-        console.log(dir)
 
         var ray = new Ray(  scener.camera.cameraPosition[0],
                             scener.camera.cameraPosition[1],
