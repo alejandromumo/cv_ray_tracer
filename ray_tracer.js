@@ -117,12 +117,12 @@ function setEventListeners(){
         y = (event.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
 
         var d = vec4()
-        d[0] = x - (canvas.width/2)
+        d[0] = x -(canvas.width/2)
         d[1] = (canvas.height/2)-y
         d[2] = -(canvas.height/2)/( Math.tan( radians(scener.fieldofview) / 2))
 
 
-        var vM = scener.camera.viewMatrix
+        var vM = scener.camera.viewMatrix;
 
         var dir = vec4()
         dir = multiplyVectorByMatrix(matrix_invert(vM),d)
@@ -132,77 +132,114 @@ function setEventListeners(){
                             scener.camera.cameraPosition[2],
                             dir[0],dir[1],dir[2])
 
-        traceRay(ray);
-        //ray.drawRay(scenel,
-        //            scener.camera.cameraPosition[0],
-        //            scener.camera.cameraPosition[1],
-        //            scener.camera.cameraPosition[2])
+        rayCast(ray,3);
 
             }, false)
 }
 
-function traceRay(ray){
-//
-//    calculate nearest intersection
-//        for each object
-//            if cube check intersectCube
-//            else check intersectsphere
-//    draw ray from eye to intersection point
-//
-//    calculate reflection rays
-//    draw reflection rays
-    //
+// Calculate nearest intersection of a ray
+function get_first_intersection(ray)
+{
 
-    var nearest = vec3()
-    var dnearest = 9999999;
-    var distance;
-    var normal = vec3()
-    var point = vec3()
-    // Calculate nearest intersection
-    for(var i = 0 ; i < scener.objects.length ; i++){
-        if( scener.objects[i].glmodel.model.name === "cube" ){
-            console.log("Test Cube intersection")
-            continue
-        }
-        if( scener.objects[i].glmodel.model.name === "sphere" ){
-            point = Ray.testSphereIntersectionSphere(ray, scener.objects[i])
-            console.log(point)
-        }
-        else{
-            console.log("not a sphere")
-            continue
+
+        var nearest = vec3()
+        var dnearest = 9999999;
+        var distance;
+        var normal = vec3()
+        var point = vec3()
+        // Calculate nearest intersection
+        for(var i = 0 ; i < scener.objects.length ; i++){
+            if( scener.objects[i].glmodel.model.name === "cube" ){
+                // console.log("Test Cube intersection");
+                continue;
+            }
+            if( scener.objects[i].glmodel.model.name === "sphere" ){
+                point = Ray.testSphereIntersectionSphere(ray, scener.objects[i]);
+                // console.log(point);
+            }
+            else{
+                // console.log("not a sphere");
+                continue;
+            }
+
+            // The Ray does not intersect this object
+            if (point == null ){
+                continue;
+            }
+
+            distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
+            if (distance < dnearest){
+                dnearest = distance;
+                nearest = point;
+            }
         }
 
-        // The Ray does not intersect this object
+        // No object was intersected
         if (point == null ){
-            console.log("Ray Missed one Object")
-            continue
+            console.log("No intersection");
+            return null;
         }
-        distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
-        if (distance < dnearest){
-            console.log("distance" + distance)
-            dnearest = distance;
-            nearest = point
-            console.log("distance2" + distance)
-        }
-        console.log(dnearest, nearest)
-    }
 
-    if (point == null ){
-        console.log("Ray Doens not intersect any Sphere")
-        return
-    }
-
-    var ray = new Ray(  scener.camera.cameraPosition[0],
-                        scener.camera.cameraPosition[1],
-                        scener.camera.cameraPosition[2],
-                        nearest[0],nearest[1],nearest[2])
-    ray.size = dnearest
-    ray.drawRay(scenel,
-            scener.camera.cameraPosition[0],
-            scener.camera.cameraPosition[1],
-            scener.camera.cameraPosition[2])
+        return nearest;
 }
+
+// Recursive function to draw initial ray and reflections
+function rayCast(ray, depth)
+{
+    if(ray == null || depth == 0)
+        return;
+
+    // compute nearest intersection of a given ray
+    var nearest = get_first_intersection(ray);
+    if(nearest != null)
+    {
+        // draw the given ray
+        console.log("Nearest : " + nearest);
+        trace_ray(ray.origin, nearest);
+        // compute the reflection of given ray into the nearest point
+        rayCast(get_reflected_ray(ray, nearest), depth - 1); // 
+    }
+    else
+        return null;
+}
+    
+// Calculate reflected ray
+function get_reflected_ray(origin_ray, nearest)
+{
+    var nearest_normal = computeNormalVector(nearest[0], nearest[1], nearest[2]);
+    var c1 = dotProduct(origin_ray.dir,nearest_normal);
+
+    var reflected_direction  = vec3();
+    reflected_direction[0] = origin_ray.dir[0] - (2 * nearest_normal[0] * c1[0]) ;
+    reflected_direction[1] = origin_ray.dir[1] - (2 * nearest_normal[1] * c1[1]) ;
+    reflected_direction[2] = origin_ray.dir[2] - (2 * nearest_normal[2] * c1[2]) ;
+
+    var dest_point_x = reflected_direction[0]  + nearest[0];
+    var dest_point_y = reflected_direction[1]  + nearest[1];
+    var dest_point_z = reflected_direction[2]  + nearest[2];
+
+    var reflected_ray = new Ray(nearest[0],nearest[1],nearest[2],
+                                dest_point_x, dest_point_y, dest_point_z);
+
+    return reflected_ray;
+}
+
+// Draw a ray
+function trace_ray(origin, dest)
+{
+    var ray = new Ray(  origin[0],
+                        origin[1],
+                        origin[2],
+                        dest[0],dest[1],dest[2]);
+    var distance = distanceBetween2Points(origin, dest);
+
+    ray.size = distance;
+    ray.drawRay(scenel,
+            origin[0],
+            origin[1],
+            origin[2]);
+}
+
 //----------------------------------------------------------------------------
 // WebGL Initialization
 function initWebGL( canvas ) {
