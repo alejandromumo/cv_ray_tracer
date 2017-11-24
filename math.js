@@ -258,3 +258,16 @@ function multiplyVectorByMatrix( m, p )
     }
     return result;
 }
+
+function distanceBetween2Points(p1, p2){
+    return Math.sqrt( Math.pow(p1[0]-p2[0],2)+Math.pow(p1[1]-p2[1], 2)+Math.pow(p1[2]-p2[2], 2))
+}
+
+
+function dotp(x,y) {
+        function dotp_sum(a,b) { return a + b;  }
+        function dotp_times(a,i) { return x[i] * y[i];  }
+        if (x.length != y.length)
+                throw "can't find dot product: arrays have different lengths";
+        return x.map(dotp_times).reduce(dotp_sum,0);
+}

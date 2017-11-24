@@ -132,18 +132,65 @@ function setEventListeners(){
                             scener.camera.cameraPosition[2],
                             dir[0],dir[1],dir[2])
 
-
-        ray.drawRay(scenel,
-                    scener.camera.cameraPosition[0],
-                    scener.camera.cameraPosition[1],
-                    scener.camera.cameraPosition[2])
+        traceRay(ray);
+        //ray.drawRay(scenel,
+        //            scener.camera.cameraPosition[0],
+        //            scener.camera.cameraPosition[1],
+        //            scener.camera.cameraPosition[2])
 
             }, false)
 }
 
+function traceRay(ray){
+//
+//    calculate nearest intersection
+//        for each object
+//            if cube check intersectCube
+//            else check intersectsphere
+//    draw ray from eye to intersection point
+//
+//    calculate reflection rays
+//    draw reflection rays
+    //
+
+    var nearest = vec3()
+    var dnearest = 9999999;
+    var distance;
+    var normal = vec3()
+    var point = vec3()
+    // Calculate nearest intersection
+    for(var i = 0 ; i < scener.objects.length ; i++){
+        if( scener.objects[i].glmodel.model.name === "cube" ){
+            console.log("Test Cube intersection")
+            continue
+        }
+        if( scener.objects[i].glmodel.model.name === "sphere" ){
+            point = Ray.testSphereIntersectionSphere(ray, scener.objects[i])
+            console.log(point)
+        }
+        else{
+            console.log("not a sphere")
+            continue
+        }
+        distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
+        if (distance < dnearest){
+            dnearest = distance;
+            nearest = point
+        }
+    }
+
+    var ray = new Ray(  scener.camera.cameraPosition[0],
+                        scener.camera.cameraPosition[1],
+                        scener.camera.cameraPosition[2],
+                        nearest[0],nearest[1],nearest[2])
+    ray.size = distance
+    ray.drawRay(scenel,
+            scener.camera.cameraPosition[0],
+            scener.camera.cameraPosition[1],
+            scener.camera.cameraPosition[2])
+}
 //----------------------------------------------------------------------------
 // WebGL Initialization
-
 function initWebGL( canvas ) {
     try {
         // Create the WebGL context

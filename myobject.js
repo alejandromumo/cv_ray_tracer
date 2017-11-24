@@ -23,33 +23,18 @@ class myObject{
 
     computeMvMatrix()
     {
-
         this.u_mvMatrix = mat4();
-
         this.u_mvMatrix = mult( this.u_mvMatrix,translationMatrix( this.tx, this.ty, this.tz ) );
-                             
-        this.u_mvMatrix = mult( this.u_mvMatrix, 
-                              rotationXXMatrix( this.angleXX ) );
-        
-        this.u_mvMatrix = mult( this.u_mvMatrix, 
-                              rotationYYMatrix( this.angleYY ) );
-        
-        
-        this.u_mvMatrix = mult( this.u_mvMatrix,
-                              rotationZZMatrix( this.angleZZ ) );
-        
-        this.u_mvMatrix = mult( this.u_mvMatrix, 
-                              scalingMatrix( this.sx, this.sy, this.sz ) );
-
+        this.u_mvMatrix = mult( this.u_mvMatrix,rotationXXMatrix( this.angleXX ) );
+        this.u_mvMatrix = mult( this.u_mvMatrix,rotationYYMatrix( this.angleYY ) );
+        this.u_mvMatrix = mult( this.u_mvMatrix,rotationZZMatrix( this.angleZZ ) );
+        this.u_mvMatrix = mult( this.u_mvMatrix,scalingMatrix( this.sx, this.sy, this.sz ) );
         var mvUniform = this.gl.getUniformLocation(this.shaderProgram, "uMVMatrix");
-        
-        this.gl.uniformMatrix4fv(mvUniform, false,
-                             new Float32Array(flatten(this.u_mvMatrix)));
+        this.gl.uniformMatrix4fv(mvUniform, false,new Float32Array(flatten(this.u_mvMatrix)));
     }
 
     drawObject(primitiveType)
     {
-
         this.computeMvMatrix();
         if(this.glmodel.model.name === "view volume")
         {
@@ -105,10 +90,8 @@ class myObject{
         this.tz = tz;
     }
 
-
     positionAts(v)
     {
-
         this.tx = v[0];
         this.ty = v[1];
         this.tz = v[2];
@@ -117,23 +100,17 @@ class myObject{
     computeLight(lightSource)
     {
         var ambientProduct = mult( this.material.kAmbi, lightSource.ambientIntensity );
-        
         var diffuseProduct = mult( this.material.kDiff, lightSource.intensity );
-        
         var specularProduct = mult( this.material.kSpec, lightSource.intensity );
 
         this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "ambientProduct"), 
             flatten(ambientProduct) );
-        
         this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "diffuseProduct"),
             flatten(diffuseProduct) );
-        
         this.gl.uniform3fv( this.gl.getUniformLocation(this.shaderProgram, "specularProduct"),
             flatten(specularProduct) );
-
         this.gl.uniform1f( this.gl.getUniformLocation(this.shaderProgram, "shininess"), 
             this.material.nPhong );
-
         this.gl.uniform4fv( this.gl.getUniformLocation(this.shaderProgram, "lightPosition"),
             flatten(lightSource.position) );
     }
