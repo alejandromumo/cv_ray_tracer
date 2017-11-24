@@ -61,9 +61,7 @@ class myObject{
         }
         else if(this.glmodel.model.name === "ray")
         {
-            console.log("Estou aqui")
             this.gl.drawArrays( this.gl.LINES,this.glmodel.start,this.glmodel.size);
-
         }
         else 
         {

@@ -22,22 +22,43 @@ class Scene{
         this.normals = [];
     }
 
-    drawScene(projectionType, primitiveType)
+    drawScene(projectionType, primitiveType, scener)
     {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // Computing the Projection Matrix
-        this.computeProjectionMatrix(projectionType);
-        this.computeViewMatrix();
-        this.computeViewerPosition();
 
         var l = this.light_sources[0];
-        this.objects.forEach(function(myObject)
+        var myObject = null;
+        this.computeProjectionMatrix();
+        this.camera.computeViewMatrix();
+
+        for(var i = 0 ; i < this.objects.length ; i++)
         {
+            myObject = this.objects[i];
             if(l.isOn)
-            	myObject.computeLight(l);
+                myObject.computeLight(l);
+
+            if(myObject.glmodel.model.name == "view volume")
+            {
+                var viewProjection = mult(this.pMatrix, this.camera.viewMatrix);
+
+                var rightViewProjection = mult(scener.pMatrix,scener.camera.viewMatrix);
+
+                var worldViewMatrix = mult(viewProjection,matrix_invert(rightViewProjection));
+
+                var vUniform = this.gl.getUniformLocation(this.shaderProgram, "uworldViewMatrix");
+                this.gl.uniformMatrix4fv(vUniform, false,
+                                     new Float32Array(flatten(worldViewMatrix)));
+            }
+            else
+            {
+                this.computeViewMatrix();
+            }
+
+            this.computeViewerPosition();
             myObject.drawObject(primitiveType);
-        });
+        }
     }
 
     computeProjectionMatrix(projectionType)
@@ -46,20 +67,16 @@ class Scene{
             this.pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
         else
             this.pMatrix = perspective( this.fieldofview, this.aspect, this.near, this.far );
-
-        var pUniform = this.gl.getUniformLocation(this.shaderProgram, "uProjectionMatrix");
-
-        this.gl.uniformMatrix4fv(pUniform, false,
-                             new Float32Array(flatten(this.pMatrix)));
     }
 
     computeViewMatrix()
     {
-        this.camera.computeViewMatrix();
-        var vUniform = this.gl.getUniformLocation(this.shaderProgram, "uCameraViewMatrix");
+        var worldViewMatrix = mult(this.pMatrix, this.camera.viewMatrix);
+        var vUniform = this.gl.getUniformLocation(this.shaderProgram, "uworldViewMatrix");
 
         this.gl.uniformMatrix4fv(vUniform, false,
-                             new Float32Array(flatten(this.camera.viewMatrix)));
+                             new Float32Array(flatten(worldViewMatrix)));
+
     }
 
     computeViewerPosition()

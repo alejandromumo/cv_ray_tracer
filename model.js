@@ -2672,10 +2672,6 @@ class Model{
         return sphere;
     }
 
-    static getVolumeModel()
-    {
-
-    }
 
 
     static getFromFile(file)
@@ -2791,6 +2787,53 @@ class Model{
         ];
         computeVertexNormals(view_volume.positionArray, view_volume.normalsArray);
         return view_volume;
+    }
+
+    static getVolumeModel(inverseProjectionMatrix)
+    {
+        var volume_model = new Model("view volume");
+        volume_model.positionArray = [
+            // Front
+            -1, -1, 1,  // 1
+             1,  1, 1,  // 3  
+            -1,  1, 1,  // 4
+
+            -1, -1, 1,  // 1
+             1, -1, 1,  // 2
+             1,  1, 1,  // 3 
+
+            // Back
+
+            -1, -1, -1,  // 5
+             1, -1, -1,  // 6
+             1,  1, -1,  // 7 
+
+            -1, -1, -1,  // 5
+             1,  1, -1,  // 7 
+            -1,  1, -1,  // 8
+
+            // Left
+
+            -1,  1, 1,  // 4
+            -1,  1, -1, // 8
+            -1, -1, -1, // 5
+
+            -1,  1, 1,  // 4
+            -1, -1, -1, // 5
+            -1, -1, 1,  // 1
+
+            // Right
+             1, -1, -1, // 6
+             1,  1, -1, // 7 
+             1,  1, 1,  // 3 
+
+             1, -1, -1, // 6
+             1,  1, 1,  // 3 
+             1, -1, 1   // 2
+        ];
+        computeVertexNormals(volume_model.positionArray, volume_model.normalsArray);
+
+        return volume_model;
     }
 
     static getRayModel(versor, size){

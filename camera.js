@@ -8,7 +8,7 @@ class Camera{
 
         this.target = vec3();
 
-        this.cameraMatrix = mat4(); // TODO confirmar o lookAt
+        this.cameraMatrix = mat4();
         this.viewMatrix = mat4();
 
         this.cameraPosition = vec3();
@@ -55,11 +55,9 @@ class Camera{
 
     computeViewMatrix()
     {
+
         this.cameraMatrix = mat4();
 
-
-
-        // this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(this.cameraPosition[0],this.cameraPosition[1],this.cameraPosition[2]));
         this.cameraMatrix = mult(this.cameraMatrix, rotationXXMatrix(this.angleXX));
         this.cameraMatrix = mult(this.cameraMatrix, rotationYYMatrix(this.angleYY));
         this.cameraMatrix = mult(this.cameraMatrix, translationMatrix(0,0,this.radius));
@@ -68,8 +66,9 @@ class Camera{
         this.cameraPosition[0] = this.cameraMatrix[0][3];
         this.cameraPosition[1] = this.cameraMatrix[1][3];
         this.cameraPosition[2] = this.cameraMatrix[2][3];
+        
+        this.cameraMatrix = lookAt_2(this.cameraPosition, this.target, this.up);
 
-        this.cameraMatrix = lookAt_2(this.cameraPosition, this.target, this.up); // 
         this.viewMatrix = matrix_invert(this.cameraMatrix);
     }
 

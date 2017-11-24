@@ -14,8 +14,7 @@
         <script id="shader-vs" type="x-shader/x-vertex">
             attribute vec3 aVertexPosition;
             uniform mat4 uMVMatrix;
-            uniform mat4 uProjectionMatrix;
-            uniform mat4 uCameraViewMatrix;
+            uniform mat4 uworldViewMatrix;
             varying vec4 vertexColor;
             // Lightsource
             attribute vec3 vNormal;
@@ -31,7 +30,7 @@
                 gl_PointSize = 5.0;
                 // Just converting the (x,y,z) vertices to Homogeneous Coord.
                 // And multiplying by the Projection and the Model-View matrix
-                gl_Position = uProjectionMatrix * uCameraViewMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position = uworldViewMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
                 // Converting the RGB color value to RGBA
                 vec3 pos = (uMVMatrix * vec4(aVertexPosition, 1.0)).xyz;
                 // vector from vertex position to light source

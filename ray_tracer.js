@@ -60,8 +60,8 @@ function tick() {
     animate( scener );
     animate( scenel );
 
-    scener.drawScene(projectionType, primitiveType);
-    scenel.drawScene(projectionType, primitiveType);
+    scener.drawScene(projectionType, primitiveType, null);
+    scenel.drawScene(projectionType, primitiveType, scener);
 }
 
 //----------------------------------------------------------------------------
@@ -71,20 +71,16 @@ function setEventListeners(){
         switch(event.keyCode){
             case 37: // rotate left LEFTKEY
                 scener.camera.deltaRotate(0,10,0);
-                viewVolume.deltarotate(0,10,0);
                 break;
             case 38: // rotate up UPKEY
                 scener.camera.deltaRotate(-10,0,0);
 
-                viewVolume.deltarotate(-10,0,0);
                 break;
             case 39: // rotate right RIGHTKEY
                 scener.camera.deltaRotate(0,-10,0);
-                viewVolume.deltarotate(0,-10,0);
                 break;
             case 40: // rotate down DOWNKEY
                 scener.camera.deltaRotate(10,0,0);
-                viewVolume.deltarotate(10,0,0);
                 break;
             case 87: // move front W
                 scenel.camera.deltaRotate(-10,0,0);
@@ -99,11 +95,11 @@ function setEventListeners(){
                 scenel.camera.deltaRotate(0,-10,0);
                 break;
             case 13:
-                //console.log("Scene right: ");
-                //console.log(scener);
-                //console.log("Scene left: ");
-                //console.log(scenel);
-                console.log(scener.camera.viewMatrix)
+                console.log("Scene right: ");
+                console.log(scener);
+                console.log("Scene left: ");
+                console.log(scenel);
+                // console.log(scener.camera.viewMatrix)
                 break;
             default:
                 console.log(event.keyCode);
@@ -302,19 +298,17 @@ function populateLeftScene()
     scenel.addCamera(camera);
 
     // Perspective parameters for left scene
-    scenel.fieldofview = 35;
-    scenel.far = 10;
+    scenel.fieldofview = 85;
+    scenel.far = 20;
     scenel.near = 1;
 
     // View Volume representing right scene view volume
-//    var frustum_model = Model.getFrustumModel(scener.fieldofview, scener.near, scener.far, scener.camera.cameraPosition);
-//    scenel.addModel(frustum_model);
-//    viewVolume = scenel.addObject(frustum_model.gl_model);
-//    viewVolume.positionAt(0,0,3)
-//    viewVolume.material.kAmbient(0.21,0.13,0.05);
-//    viewVolume.material.kDiffuse(0.71,0.43,0.18);
-//    viewVolume.material.kSpecular(0.39,0.27,0.17);
-//    viewVolume.material.nPhongs(25.6);
+    scenel.addModel(frustum_model);
+    viewVolume = scenel.addObject(frustum_model.gl_model);
+    viewVolume.material.kAmbient(0.21,0.13,0.05);
+    viewVolume.material.kDiffuse(0.71,0.43,0.18);
+    viewVolume.material.kSpecular(0.39,0.27,0.17);
+    viewVolume.material.nPhongs(25.6);
 }
 
 function initModels()
@@ -324,6 +318,7 @@ function initModels()
     floor_model = Model.getFloorModel();
     bck_model = Model.getBackgroundModel();
     sphere_model = Model.getSphereModel();
+    frustum_model = Model.getVolumeModel();
 }
 
 

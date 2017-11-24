@@ -250,7 +250,6 @@ function normalize( v  ) {
 
 function multiplyVectorByMatrix( m, p )
 {
-    console.log("xDDD")
     var result = vec4();
     for( var i = 0; i < 4; i++  ) {
         for( var j = 0; j < 4; j++  ) {     // Can stop earlier; 4th coord is ZERO !!
