@@ -172,18 +172,32 @@ function traceRay(ray){
             console.log("not a sphere")
             continue
         }
+
+        // The Ray does not intersect this object
+        if (point == null ){
+            console.log("Ray Missed one Object")
+            continue
+        }
         distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
         if (distance < dnearest){
+            console.log("distance" + distance)
             dnearest = distance;
             nearest = point
+            console.log("distance2" + distance)
         }
+        console.log(dnearest, nearest)
+    }
+
+    if (point == null ){
+        console.log("Ray Doens not intersect any Sphere")
+        return
     }
 
     var ray = new Ray(  scener.camera.cameraPosition[0],
                         scener.camera.cameraPosition[1],
                         scener.camera.cameraPosition[2],
                         nearest[0],nearest[1],nearest[2])
-    ray.size = distance
+    ray.size = dnearest
     ray.drawRay(scenel,
             scener.camera.cameraPosition[0],
             scener.camera.cameraPosition[1],
@@ -303,6 +317,14 @@ function initScene( name , gl , shaderProgram){
     sphere.material.kSpecular(0.39,0.27,0.17);
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
+
+    var sphere2 = scene.addObject(sphere_model.gl_model);
+        sphere2.positionAt(0.55,-0.65,-0.5);
+        sphere2.material.kAmbient(0.21,0.13,0.05);
+        sphere2.material.kDiffuse(0.71,0.43,0.18);    
+        sphere2.material.kSpecular(0.39,0.27,0.17);
+        sphere2.material.nPhongs(25.6);
+        sphere2.scale(0.35,0.35,0.35);
     return scene;
 }
 

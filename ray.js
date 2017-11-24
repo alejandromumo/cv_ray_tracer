@@ -33,30 +33,30 @@ class Ray{
         C[0] = sphere.tx
         C[1] = sphere.ty
         C[2] = sphere.tz
-        //console.log("C-"+C)
+//        console.log("C-"+C)
         L[0] = sphere.tx - ray.origin[0]
         L[1] = sphere.ty - ray.origin[1]
         L[2] = sphere.tz - ray.origin[2]
-        //console.log("L-"+L)
+//        console.log("L-"+L)
 
         tca = dotp(L,ray.dir)
-        //console.log("tca-"+tca)
+//        console.log("tca-"+tca)
         if (tca < 0 ) return null
 
         d2 = dotp(L,L) - (tca*tca)
         radius2 = Math.pow(sphere.sx,2)
-        //console.log("d2-"+d2)
-        //console.log("radius2-"+radius2)
+//        console.log("d2-"+d2)
+//        console.log("radius2-"+radius2)
         if (d2 > radius2 ) return null
 
         thc = Math.sqrt(radius2-d2)
-        //console.log("thc-"+thc)
+//        console.log("thc-"+thc)
 
         t0 = tca-thc
         intersection[0] = ray.origin[0] + (ray.dir[0]*t0)
         intersection[1] = ray.origin[1] + (ray.dir[1]*t0)
         intersection[2] = ray.origin[2] + (ray.dir[2]*t0)
-        //console.log("intersection-"+intersection)
+//        console.log("intersection-"+intersection)
         return intersection
     }
 }
