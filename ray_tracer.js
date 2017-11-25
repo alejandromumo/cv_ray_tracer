@@ -124,7 +124,7 @@ function setEventListeners(){
 
         var vM = scener.camera.viewMatrix;
 
-        var dir = vec4()
+        var dir = vec4();
         dir = multiplyVectorByMatrix(matrix_invert(vM),d)
 
         var ray = new Ray(  scener.camera.cameraPosition[0],
@@ -147,72 +147,73 @@ function get_first_intersection(ray)
         var distance;
         var normal = vec3()
         var point = vec3()
+        var sphere_center = vec3();
+        var nearest_normal = vec3();
+        var tmp = null;
+        var found = false;
         // Calculate nearest intersection
         for(var i = 0 ; i < scener.objects.length ; i++){
-            if( scener.objects[i].glmodel.model.name === "cube" ){
-                // console.log("Test Cube intersection");
-                continue;
-            }
             if( scener.objects[i].glmodel.model.name === "sphere" ){
-                point = Ray.testSphereIntersectionSphere(ray, scener.objects[i]);
+                
+                tmp = Ray.testSphereIntersectionSphere(ray, scener.objects[i]);
                 // console.log(point);
-            }
-            else{
-                // console.log("not a sphere");
-                continue;
-            }
+                // The Ray does not intersect this object
+                if (tmp == null ){
+                    continue;
+                }
+                point = tmp[0];
+                sphere_center = tmp[1];
 
-            // The Ray does not intersect this object
-            if (point == null ){
-                continue;
-            }
-
-            distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
-            if (distance < dnearest){
-                dnearest = distance;
-                nearest = point;
+                distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
+                if (distance < dnearest){
+                    dnearest = distance;
+                    nearest = point;
+                    nearest_normal = subtract(point, sphere_center);
+                    normalize(nearest_normal);
+                    found = true;
+                }
             }
         }
 
         // No object was intersected
-        if (point == null ){
+        if (found == false ){
             console.log("No intersection");
             return null;
         }
 
-        return nearest;
+
+        return [nearest,nearest_normal];
 }
 
 // Recursive function to draw initial ray and reflections
 function rayCast(ray, depth)
 {
-    if(ray == null || depth == 0)
+    var tmp = get_first_intersection(ray);
+    if(ray == null || depth == 0 || tmp == null)
         return;
-
     // compute nearest intersection of a given ray
-    var nearest = get_first_intersection(ray);
+    var nearest = tmp[0];
+    var nearest_normal = tmp[1];
+
     if(nearest != null)
     {
         // draw the given ray
-        console.log("Nearest : " + nearest);
         trace_ray(ray.origin, nearest);
         // compute the reflection of given ray into the nearest point
-        rayCast(get_reflected_ray(ray, nearest), depth - 1); // 
+        rayCast(get_reflected_ray(ray, nearest, nearest_normal), depth - 1); // 
     }
     else
         return null;
 }
     
 // Calculate reflected ray
-function get_reflected_ray(origin_ray, nearest)
+function get_reflected_ray(origin_ray, nearest, nearest_normal)
 {
-    var nearest_normal = computeNormalVector(nearest[0], nearest[1], nearest[2]);
-    var c1 = dotProduct(origin_ray.dir,nearest_normal);
-
+    var c1 = dotProduct(origin_ray.dir, nearest_normal);
     var reflected_direction  = vec3();
-    reflected_direction[0] = origin_ray.dir[0] - (2 * nearest_normal[0] * c1[0]) ;
-    reflected_direction[1] = origin_ray.dir[1] - (2 * nearest_normal[1] * c1[1]) ;
-    reflected_direction[2] = origin_ray.dir[2] - (2 * nearest_normal[2] * c1[2]) ;
+    reflected_direction[0] = origin_ray.dir[0] - (2 * nearest_normal[0] * c1) ;
+    reflected_direction[1] = origin_ray.dir[1] - (2 * nearest_normal[1] * c1) ;
+    reflected_direction[2] = origin_ray.dir[2] - (2 * nearest_normal[2] * c1) ;
 
     var dest_point_x = reflected_direction[0]  + nearest[0];
     var dest_point_y = reflected_direction[1]  + nearest[1];
@@ -356,12 +357,21 @@ function initScene( name , gl , shaderProgram){
     sphere.scale(0.35,0.35,0.35);
 
     var sphere2 = scene.addObject(sphere_model.gl_model);
-        sphere2.positionAt(0.55,-0.65,-0.5);
-        sphere2.material.kAmbient(0.21,0.13,0.05);
-        sphere2.material.kDiffuse(0.71,0.43,0.18);    
-        sphere2.material.kSpecular(0.39,0.27,0.17);
-        sphere2.material.nPhongs(25.6);
-        sphere2.scale(0.35,0.35,0.35);
+    sphere2.positionAt(0.55,-0.65,-0.5);
+    sphere2.material.kAmbient(0.21,0.13,0.05);
+    sphere2.material.kDiffuse(0.71,0.43,0.18);    
+    sphere2.material.kSpecular(0.39,0.27,0.17);
+    sphere2.material.nPhongs(25.6);
+    sphere2.scale(0.35,0.35,0.35);
+
+
+    var sphere3 = scene.addObject(sphere_model.gl_model);
+    sphere3.positionAt(-0.10,-0.65, 0.05);
+    sphere3.material.kAmbient(0.21,0.13,0.05);
+    sphere3.material.kDiffuse(0.71,0.43,0.18);    
+    sphere3.material.kSpecular(0.39,0.27,0.17);
+    sphere3.material.nPhongs(25.6);
+    sphere3.scale(0.35,0.35,0.35);
     return scene;
 }
 
