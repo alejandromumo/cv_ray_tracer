@@ -15,6 +15,7 @@ class Ray{
         this.logRay();
         var Ray_Model = Model.getRayModel(this.dir, this.size);
         scene.addModel(Ray_Model)
+        scene.initBuffers();
         var ray = scene.addObject(Ray_Model.gl_model)
         ray.positionAt(x,y,z);
     }

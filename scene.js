@@ -24,7 +24,7 @@ class Scene{
 
     drawScene(projectionType, primitiveType, scener)
     {
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
 
         // Computing the Projection Matrix
 
@@ -93,14 +93,14 @@ class Scene{
 
         this.model_vertices = this.model_vertices.concat(model.positionArray);
         this.normals = this.normals.concat(model.normalsArray);
-        this.initBuffers();
+        //this.initBuffers();
 
         this.next_model_index += gl_model.size;
     }
 
     addObject(gl_model)
     {
-        var newObject = new myObject(gl_model, this.gl, this.shaderProgram);
+        let newObject = new myObject(gl_model, this.gl, this.shaderProgram);
         this.objects.push(newObject);
         return newObject;
     }

@@ -5,8 +5,17 @@ var gll = null; // WebGL context
 var glr = null;
 var viewVolume = null;
 
+var currScene = 3;
+
 var scenel = null;
 var scener = null;
+
+var scener1 = null;
+var scenel1 = null;
+var scener2 = null;
+var scenel2 = null;
+var scener3 = null;
+var scenel3 = null;
 
 var shaderProgram = null;
 var triangleVertexPositionBuffer = null;
@@ -65,6 +74,35 @@ function tick() {
 }
 
 //----------------------------------------------------------------------------
+function loadScene3(){
+    console.log("Load Scene3")
+    if(currScene == 3) return;
+    currScene = 3
+    scener3.initBuffers()
+    scenel3.initBuffers()
+    scener = scener3
+    scenel = scenel3
+}
+
+function loadScene2(){
+    console.log("Load Scene2")
+    if(currScene == 2) return;
+    currScene = 2
+    scener2.initBuffers()
+    scenel2.initBuffers()
+    scener = scener2
+    scenel = scenel2
+}
+
+function loadScene1(){
+    console.log("Load Scene1")
+    if(currScene == 1) return;
+    currScene = 1
+    scener1.initBuffers()
+    scenel1.initBuffers()
+    scener = scener1
+    scenel = scenel1
+}
 
 function setEventListeners(){
     document.addEventListener('keydown', function(event){
@@ -288,16 +326,32 @@ function initScenes(canvasl, canvasr)
 
     // Initialize scenes and add models 
     //  and common objects to each of them
-    scener = initScene("right scene", glr, shaderProgramRight);
-    scenel = initScene("left scene", gll, shaderProgramLeft);
+    scener1 = initScene1("right-scene1", glr, shaderProgramRight);
+    scenel1 = initScene1("left-scene1", gll, shaderProgramLeft);
+    scener1 = populateRightScene(scener1);
+    scenel1 = populateLeftScene(scenel1);
 
-    // Populate each scene as desired
-    populateRightScene();
-    populateLeftScene();
+    scener2 = initScene2("right-scene2", glr, shaderProgramRight);
+    scenel2 = initScene2("left-scene2", gll, shaderProgramLeft);
+    scener2 = populateRightScene(scener2);
+    scenel2 = populateLeftScene(scenel2);
+    
+    scener3 = initScene3("right-scene3", glr, shaderProgramRight);
+    scenel3 = initScene3("left-scene3", gll, shaderProgramLeft);
+    scener3 = populateRightScene(scener3);
+    scenel3 = populateLeftScene(scenel3);
+    
+    scener3.initBuffers()
+    scenel3.initBuffers()
+
+    scener = scener3
+    scenel = scenel3
+
+    
 }
 
-function initScene( name , gl , shaderProgram){
-    var scene = new Scene(name, gl, shaderProgram);
+function initScene3( name , gl , shaderProgram){
+    let scene = new Scene(name, gl, shaderProgram);
 
     scene.addModel(cube_model);
     scene.addModel(pyramid_model);
@@ -306,33 +360,28 @@ function initScene( name , gl , shaderProgram){
     scene.addModel(sphere_model);
 
     // Criação objetos
-    var cube = scene.addObject(cube_model.gl_model);
+    let cube = scene.addObject(cube_model.gl_model);
     cube.positionAt(-0.75, -0.75, -0.75);
     cube.material.kAmbient(0.25,0.20,0.07);
     cube.material.kDiffuse(0.75,0.60,0.23);
     cube.material.kSpecular(0.63,0.56,0.37);
     cube.material.nPhongs(51.2);
 
-    var pyramid = scene.addObject(pyramid_model.gl_model);
+    let pyramid = scene.addObject(pyramid_model.gl_model);
     pyramid.positionAt( -0.75, 0.5,0);
     pyramid.material.kDiffuse(1,0,0);
 
-    var floor = scene.addObject(floor_model.gl_model);
+    let floor = scene.addObject(floor_model.gl_model);
     floor.material.kDiffuse(1,1,1);
 
-    // var ceiling = scene.addObject(floor_model.gl_model);
-    // ceiling.material.kAmbient(0.21,0.13,0.05);
-    // ceiling.rotate(0,0,180)
-    // ceiling.positionAt(0,0,0);
-
-    var background = scene.addObject(bck_model.gl_model);
+    let background = scene.addObject(bck_model.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
     background.material.kDiffuse(0.71,0.43,0.18);
     background.material.kSpecular(0.39,0.27,0.17);
     background.material.nPhongs(25.6);
     background.positionAt(0,0,0);
 
-    var leftwall = scene.addObject(bck_model.gl_model);
+    let leftwall = scene.addObject(bck_model.gl_model);
     leftwall.material.kAmbient(0.21,0.13,0.05);
     leftwall.material.kDiffuse(0.71,0.43,0.18);
     leftwall.material.kSpecular(0.39,0.27,0.17);
@@ -340,7 +389,7 @@ function initScene( name , gl , shaderProgram){
     leftwall.rotate(0,90,0)
     leftwall.positionAt(0,0,0);
 
-    var rightwall = scene.addObject(bck_model.gl_model);
+    let rightwall = scene.addObject(bck_model.gl_model);
     rightwall.material.kAmbient(0.21,0.13,0.05);
     rightwall.material.kDiffuse(0.71,0.43,0.18);
     rightwall.material.kSpecular(0.39,0.27,0.17);
@@ -348,7 +397,7 @@ function initScene( name , gl , shaderProgram){
     rightwall.rotate(0,270,0)
     rightwall.positionAt(0,0,0);
 
-    var sphere = scene.addObject(sphere_model.gl_model);
+    let sphere = scene.addObject(sphere_model.gl_model);
     sphere.positionAt(0.55,-0.65,0.55);
     sphere.material.kAmbient(0.21,0.13,0.05);
     sphere.material.kDiffuse(0.71,0.43,0.18);    
@@ -356,7 +405,7 @@ function initScene( name , gl , shaderProgram){
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
 
-    var sphere2 = scene.addObject(sphere_model.gl_model);
+    let sphere2 = scene.addObject(sphere_model.gl_model);
     sphere2.positionAt(0.55,-0.65,-0.5);
     sphere2.material.kAmbient(0.21,0.13,0.05);
     sphere2.material.kDiffuse(0.71,0.43,0.18);    
@@ -364,8 +413,7 @@ function initScene( name , gl , shaderProgram){
     sphere2.material.nPhongs(25.6);
     sphere2.scale(0.35,0.35,0.35);
 
-
-    var sphere3 = scene.addObject(sphere_model.gl_model);
+    let sphere3 = scene.addObject(sphere_model.gl_model);
     sphere3.positionAt(-0.10,-0.65, 0.05);
     sphere3.material.kAmbient(0.21,0.13,0.05);
     sphere3.material.kDiffuse(0.71,0.43,0.18);    
@@ -375,56 +423,112 @@ function initScene( name , gl , shaderProgram){
     return scene;
 }
 
-function populateRightScene()
+
+function initScene2( name , gl , shaderProgram){
+    let scene = new Scene(name, gl, shaderProgram);
+
+    scene.addModel(floor_model);
+    scene.addModel(sphere_model);
+
+    let floor = scene.addObject(floor_model.gl_model);
+    floor.material.kAmbient(0,1,0);    
+    floor.material.kDiffuse(1,1,1);
+    floor.scale(5,1,5)
+
+    let sphere = scene.addObject(sphere_model.gl_model);
+    sphere.positionAt(0.55,-0.65,0.55);
+    sphere.material.kAmbient(0.21,0.13,0.05);
+    sphere.material.kDiffuse(0.71,0.43,0.18);    
+    sphere.material.kSpecular(0.39,0.27,0.17);
+    sphere.material.nPhongs(25.6);
+    sphere.scale(0.35,0.35,0.35);
+
+    let sphere2 = scene.addObject(sphere_model.gl_model);
+    sphere2.positionAt(0.55,-0.65,-0.5);
+    sphere2.material.kAmbient(0.21,0.13,0.05);
+    sphere2.material.kDiffuse(0.71,0.43,0.18);    
+    sphere2.material.kSpecular(0.39,0.27,0.17);
+    sphere2.material.nPhongs(25.6);
+    sphere2.scale(0.35,0.35,0.35);
+
+    let sphere3 = scene.addObject(sphere_model.gl_model);
+    sphere3.positionAt(-0.10,-0.65, 0.05);
+    sphere3.material.kAmbient(0.21,0.13,0.05);
+    sphere3.material.kDiffuse(0.71,0.43,0.18);    
+    sphere3.material.kSpecular(0.39,0.27,0.17);
+    sphere3.material.nPhongs(25.6);
+    sphere3.scale(0.35,0.35,0.35);
+
+    return scene;
+}
+
+function initScene1( name , gl , shaderProgram){
+    let scene = new Scene(name, gl, shaderProgram);
+    
+    scene.addModel(floor_model);
+
+    let floor = scene.addObject(floor_model.gl_model);
+    floor.material.kAmbient(0,0,0);    
+    floor.material.kDiffuse(1,1,1);
+    floor.scale(5,1,5)
+
+    return scene;
+}
+
+function populateRightScene(sr)
 {
     // Add light to right scene
-    var light_source = new LightSource();
+    let light_source = new LightSource();
     light_source.positionAt(0,0,0.5);
     light_source.type(0); // 1 -> omni , 0 -> directional
     light_source.switchOn();
-    scener.addLightSource(light_source);
+    sr.addLightSource(light_source);
 
     // Add camera into right scene
-    var camera = new Camera();
+    let camera = new Camera();
     camera.radius = 4;
     camera.lookAt(0,0,0);
-    scener.addCamera(camera);
+    sr.addCamera(camera);
 
     // Perspective parameters for right scene
-    scener.fieldofview = 35;
-    scener.far = 10;
-    scener.near = 1;
+    sr.fieldofview = 35;
+    sr.far = 10;
+    sr.near = 1;
+
+    return sr
 }
 
-function populateLeftScene()
+function populateLeftScene(sl)
 {
     // Add light to left scene
-    var light_source = new LightSource();
+    let light_source = new LightSource();
     light_source.positionAt(0,0.2,1.30);
     light_source.type(0); // 1 -> omni , 0 -> directional
     light_source.switchOn();
-    scenel.addLightSource(light_source);
+    sl.addLightSource(light_source);
 
     // Add camera to left scene
-    var camera = new Camera();
+    let camera = new Camera();
     //camera.rotate(10,40,0);
     //camera.positionAt(0,0,10);
     camera.lookAt(0,0,0);
     camera.radius = 6;
-    scenel.addCamera(camera);
+    sl.addCamera(camera);
 
     // Perspective parameters for left scene
-    scenel.fieldofview = 85;
-    scenel.far = 20;
-    scenel.near = 1;
+    sl.fieldofview = 85;
+    sl.far = 20;
+    sl.near = 1;
 
     // View Volume representing right scene view volume
-    scenel.addModel(frustum_model);
-    viewVolume = scenel.addObject(frustum_model.gl_model);
+    sl.addModel(frustum_model);
+    viewVolume = sl.addObject(frustum_model.gl_model);
     viewVolume.material.kAmbient(0.21,0.13,0.05);
     viewVolume.material.kDiffuse(0.71,0.43,0.18);
     viewVolume.material.kSpecular(0.39,0.27,0.17);
     viewVolume.material.nPhongs(25.6);
+
+    return sl
 }
 
 function initModels()
