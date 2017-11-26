@@ -134,6 +134,10 @@
                     Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
                     </p>
                     <h3 id="demo">Demo</h3>
+                    <label for="mode" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+                        <input type="checkbox" id="mode" class="mdl-switch__input" onchange="changeMode()">
+                        <span class="mdl-switch__label">Pick Sphere / Trace Ray</span>
+                    </label>
                     <div class="mdl-grid" align="center">
                         <div class="mdl-cell mdl-cell mdl-cell--6-col">
                             <button onclick="loadScene1();" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
@@ -148,28 +152,30 @@
                             </p>
                             <canvas id="canvasl" style="border:1px solid #000000;" width="350" height="350"></canvas>
                             </p>
-                            <h5>Add New Objects</h3>
+                            <h5>Objects Actions</h3>
                             <div class="demo-list-action mdl-list">
                                 <div class="mdl-list__item">
                                     <span class="mdl-list__item-primary-content">
                                         <span>Sphere</span>
                                     </span>
                                     <a class="mdl-list__item-secondary-action" href="#">
-                                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                        <button onclick="addSphereToScene();" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
                                             New
                                         </button>
                                     </a>
                                 </div>
-                                <div class="mdl-list__item">
-                                    <span class="mdl-list__item-primary-content">
-                                        <span>Cube</span>
-                                    </span>
-                                    <a class="mdl-list__item-secondary-action" href="#">
-                                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-                                            New
-                                        </button>
-                                    </a>
-                                </div>
+                                X position
+                                <p style="width:300px">
+                                    <input onchange="updateObj();" class="mdl-slider mdl-js-slider" type="range" id="x_obj" min="-7" max="7" value="0" step="0.2">
+                                </p>
+                                Y position
+                                <p style="width:300px">
+                                    <input onchange="updateObj();" class="mdl-slider mdl-js-slider" type="range" id="y_obj" min="-7" max="7" value="0" step="0.2">
+                                </p>
+                                Z position
+                                <p style="width:300px">
+                                    <input onchange="updateObj();" class="mdl-slider mdl-js-slider" type="range" id="z_obj" min="-7" max="7" value="0" step="0.2">
+                                </p>                                                                                                            
                             </div>
                         </div>
                         <div class="mdl-cell mdl-cell mdl-cell--6-col">

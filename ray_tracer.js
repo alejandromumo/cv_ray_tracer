@@ -4,8 +4,11 @@
 var gll = null; // WebGL context
 var glr = null;
 var viewVolume = null;
+var modePick = true;
 
 var currScene = 3;
+var currObjectl = null;
+var currObjectr = null;
 
 var scenel = null;
 var scener = null;
@@ -78,6 +81,8 @@ function loadScene3(){
     console.log("Load Scene3")
     if(currScene == 3) return;
     currScene = 3
+    currObjectl = scenel3.objects[2]
+    currObjectr = scener3.objects[1]
     scener3.initBuffers()
     scenel3.initBuffers()
     scener = scener3
@@ -88,6 +93,8 @@ function loadScene2(){
     console.log("Load Scene2")
     if(currScene == 2) return;
     currScene = 2
+    currObjectl = scenel2.objects[2]
+    currObjectr = scener2.objects[1]
     scener2.initBuffers()
     scenel2.initBuffers()
     scener = scener2
@@ -98,10 +105,31 @@ function loadScene1(){
     console.log("Load Scene1")
     if(currScene == 1) return;
     currScene = 1
+    currObjectl = null
+    currObjectr = null
     scener1.initBuffers()
     scenel1.initBuffers()
     scener = scener1
     scenel = scenel1
+}
+
+function updateObj(){
+    if (currObjectl== null) return;
+
+    let objx = document.getElementById('x_obj').value;
+    let objy = document.getElementById('y_obj').value;
+    let objz = document.getElementById('z_obj').value;
+
+    currObjectl.positionAt(objx,objy, objz);
+    currObjectr.positionAt(objx,objy, objz);
+}
+
+function changeMode(){
+    modePick = !modePick
+}
+
+function addSphereToScene(){
+    console.log("Add Sphere")
 }
 
 function setEventListeners(){
@@ -154,6 +182,8 @@ function setEventListeners(){
         x = (event.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
         y = (event.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
 
+        console.log("x-"+x+"y"+y)
+
         var d = vec4()
         d[0] = x -(canvas.width/2)
         d[1] = (canvas.height/2)-y
@@ -170,18 +200,23 @@ function setEventListeners(){
                             scener.camera.cameraPosition[2],
                             dir[0],dir[1],dir[2])
 
-        rayCast(ray,3);
-
-            }, false)
+        if(modePick){
+            let id = get_first_intersection(ray, pick=true)
+            if (id==null) return;
+            currObjectr = scener.objects[id];
+            currObjectl = scenel.objects[id+1];
+        }else{
+            rayCast(ray,3);
+        }
+            }, false);
 }
 
 // Calculate nearest intersection of a ray
-function get_first_intersection(ray)
+function get_first_intersection(ray, pick=false)
 {
-
-
+        var objId = null;
         var nearest = vec3()
-        var dnearest = 9999999;
+        var dnearest = Infinity;
         var distance;
         var normal = vec3()
         var point = vec3()
@@ -204,6 +239,7 @@ function get_first_intersection(ray)
 
                 distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
                 if (distance < dnearest){
+                    objId = i;
                     dnearest = distance;
                     nearest = point;
                     nearest_normal = subtract(point, sphere_center);
@@ -212,11 +248,14 @@ function get_first_intersection(ray)
                 }
             }
         }
-
         // No object was intersected
         if (found == false ){
             console.log("No intersection");
             return null;
+        }
+        if(pick){
+            console.log("Id-"+objId)
+            return objId;
         }
 
 
@@ -327,22 +366,25 @@ function initScenes(canvasl, canvasr)
     // Initialize scenes and add models 
     //  and common objects to each of them
     scener1 = initScene1("right-scene1", glr, shaderProgramRight);
-    scenel1 = initScene1("left-scene1", gll, shaderProgramLeft);
+    scenel1 = initScene1("left-scene1", gll, shaderProgramLeft, true);
     scener1 = populateRightScene(scener1);
     scenel1 = populateLeftScene(scenel1);
 
     scener2 = initScene2("right-scene2", glr, shaderProgramRight);
-    scenel2 = initScene2("left-scene2", gll, shaderProgramLeft);
+    scenel2 = initScene2("left-scene2", gll, shaderProgramLeft, true);
     scener2 = populateRightScene(scener2);
     scenel2 = populateLeftScene(scenel2);
     
     scener3 = initScene3("right-scene3", glr, shaderProgramRight);
-    scenel3 = initScene3("left-scene3", gll, shaderProgramLeft);
+    scenel3 = initScene3("left-scene3", gll, shaderProgramLeft, true);
     scener3 = populateRightScene(scener3);
     scenel3 = populateLeftScene(scenel3);
     
     scener3.initBuffers()
     scenel3.initBuffers()
+
+    currObjectl = scenel3.objects[1]
+    currObjectr = scener3.objects[0]
 
     scener = scener3
     scenel = scenel3
@@ -350,7 +392,7 @@ function initScenes(canvasl, canvasr)
     
 }
 
-function initScene3( name , gl , shaderProgram){
+function initScene3( name , gl , shaderProgram, frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
 
     scene.addModel(cube_model);
@@ -358,6 +400,16 @@ function initScene3( name , gl , shaderProgram){
     scene.addModel(floor_model);
     scene.addModel(bck_model);
     scene.addModel(sphere_model);
+
+    if(frustrum){
+        // View Volume representing right scene view volume
+        scene.addModel(frustum_model);
+        let viewVolume = scene.addObject(frustum_model.gl_model);
+        viewVolume.material.kAmbient(0.21,0.13,0.05);
+        viewVolume.material.kDiffuse(0.71,0.43,0.18);
+        viewVolume.material.kSpecular(0.39,0.27,0.17);
+        viewVolume.material.nPhongs(25.6);
+    }
 
     // Criação objetos
     let cube = scene.addObject(cube_model.gl_model);
@@ -420,15 +472,25 @@ function initScene3( name , gl , shaderProgram){
     sphere3.material.kSpecular(0.39,0.27,0.17);
     sphere3.material.nPhongs(25.6);
     sphere3.scale(0.35,0.35,0.35);
+
     return scene;
 }
 
-
-function initScene2( name , gl , shaderProgram){
+function initScene2( name , gl , shaderProgram,  frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
 
     scene.addModel(floor_model);
     scene.addModel(sphere_model);
+
+    if(frustrum){
+        // View Volume representing right scene view volume
+        scene.addModel(frustum_model);
+        let viewVolume = scene.addObject(frustum_model.gl_model);
+        viewVolume.material.kAmbient(0.21,0.13,0.05);
+        viewVolume.material.kDiffuse(0.71,0.43,0.18);
+        viewVolume.material.kSpecular(0.39,0.27,0.17);
+        viewVolume.material.nPhongs(25.6);
+    }
 
     let floor = scene.addObject(floor_model.gl_model);
     floor.material.kAmbient(0,1,0);    
@@ -462,10 +524,20 @@ function initScene2( name , gl , shaderProgram){
     return scene;
 }
 
-function initScene1( name , gl , shaderProgram){
+function initScene1( name , gl , shaderProgram, frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
     
     scene.addModel(floor_model);
+
+    if(frustrum){
+        // View Volume representing right scene view volume
+        scene.addModel(frustum_model);
+        let viewVolume = scene.addObject(frustum_model.gl_model);
+        viewVolume.material.kAmbient(0.21,0.13,0.05);
+        viewVolume.material.kDiffuse(0.71,0.43,0.18);
+        viewVolume.material.kSpecular(0.39,0.27,0.17);
+        viewVolume.material.nPhongs(25.6);
+    }
 
     let floor = scene.addObject(floor_model.gl_model);
     floor.material.kAmbient(0,0,0);    
@@ -519,14 +591,6 @@ function populateLeftScene(sl)
     sl.fieldofview = 85;
     sl.far = 20;
     sl.near = 1;
-
-    // View Volume representing right scene view volume
-    sl.addModel(frustum_model);
-    viewVolume = sl.addObject(frustum_model.gl_model);
-    viewVolume.material.kAmbient(0.21,0.13,0.05);
-    viewVolume.material.kDiffuse(0.71,0.43,0.18);
-    viewVolume.material.kSpecular(0.39,0.27,0.17);
-    viewVolume.material.nPhongs(25.6);
 
     return sl
 }
