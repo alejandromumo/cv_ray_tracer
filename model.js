@@ -2696,7 +2696,6 @@ class Model{
                 {
                     // For every vertex we have 3 floating point values
                     for( j = 1; j < 4; j++ ) {
-                        console.log(parseFloat(tokens[j]))
                         newVertices.push( parseFloat( tokens[ j ] ) );
                     }
                 }
@@ -2719,7 +2718,6 @@ class Model{
             scene.addModel(obj);
             var xD = scene.addObject(obj.gl_model);
             xD.rotate(40,10,20)
-            console.log(xD); 
             scene.drawScene(projectionType, primitiveType);
         };
         reader.readAsText(file);

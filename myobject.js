@@ -19,6 +19,8 @@ class myObject{
         this.angleZZ = 0;
 
         this.material = new Material();
+
+        this.center = vec3();
     }
 
     computeMvMatrix()

@@ -182,8 +182,6 @@ function setEventListeners(){
         x = (event.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
         y = (event.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
 
-        console.log("x-"+x+"y"+y)
-
         var d = vec4()
         d[0] = x -(canvas.width/2)
         d[1] = (canvas.height/2)-y
@@ -199,6 +197,7 @@ function setEventListeners(){
                             scener.camera.cameraPosition[1],
                             scener.camera.cameraPosition[2],
                             dir[0],dir[1],dir[2])
+        ray.origin_object = scener.camera;
 
         if(modePick){
             let id = get_first_intersection(ray, pick=true)
@@ -224,6 +223,7 @@ function get_first_intersection(ray, pick=false)
         var nearest_normal = vec3();
         var tmp = null;
         var found = false;
+        var dest_object = null;
         // Calculate nearest intersection
         for(var i = 0 ; i < scener.objects.length ; i++){
             if( scener.objects[i].glmodel.model.name === "sphere" ){
@@ -236,6 +236,8 @@ function get_first_intersection(ray, pick=false)
                 }
                 point = tmp[0];
                 sphere_center = tmp[1];
+                scener.objects[i].center = sphere_center;
+                ray.dest_object = scener.objects[i];
 
                 distance =  distanceBetween2Points(scener.camera.cameraPosition, point)
                 if (distance < dnearest){
@@ -267,20 +269,21 @@ function rayCast(ray, depth)
 {
     var tmp = get_first_intersection(ray);
     if(ray == null || depth == 0 || tmp == null)
+    {
+        // trace_ray(ray.origin, scener.light_sources[0].position);
         return;
+    }
     // compute nearest intersection of a given ray
     var nearest = tmp[0];
     var nearest_normal = tmp[1];
 
-    if(nearest != null)
-    {
-        // draw the given ray
-        trace_ray(ray.origin, nearest);
-        // compute the reflection of given ray into the nearest point
-        rayCast(get_reflected_ray(ray, nearest, nearest_normal), depth - 1); // 
-    }
-    else
-        return null;
+    // draw the given ray
+    trace_ray(ray.origin, nearest);
+    // compute vertex colors
+    if(ray.origin_object.glmodel != null)
+        computeColors(ray);
+    // compute the reflection of given ray into the nearest point
+    rayCast(get_reflected_ray(ray, nearest, nearest_normal), depth - 1);
 }
     
 // Calculate reflected ray
@@ -299,25 +302,132 @@ function get_reflected_ray(origin_ray, nearest, nearest_normal)
     var reflected_ray = new Ray(nearest[0],nearest[1],nearest[2],
                                 dest_point_x, dest_point_y, dest_point_z);
 
+    reflected_ray.origin_object = origin_ray.dest_object;
     return reflected_ray;
 }
 
 // Draw a ray
 function trace_ray(origin, dest)
 {
-    var ray = new Ray(  origin[0],
-                        origin[1],
-                        origin[2],
+    var ray = new Ray(  origin[0],origin[1],origin[2],
                         dest[0],dest[1],dest[2]);
     var distance = distanceBetween2Points(origin, dest);
-
     ray.size = distance;
     ray.drawRay(scenel,
-            origin[0],
-            origin[1],
-            origin[2]);
+                origin[0],origin[1],origin[2]);
 }
 
+// compute origin and dest vertex colors
+function computeColors(ray)
+{
+    var origin_vertex = ray.origin;
+    var origin_vertex_color = getColor(ray.origin_object, origin_vertex);
+    var dest_vertex = ray.dest;
+    var dest_vertex_color = getColor(ray.dest_object, dest_vertex);
+    var new_color = vec3();
+    var reflection_index = 0.6;
+    new_color[0] = (reflection_index * origin_vertex_color[0])
+    + ((1 - reflection_index) * dest_vertex_color[0]) ;
+    new_color[1] = (reflection_index * origin_vertex_color[1])
+    + ((1 - reflection_index) * dest_vertex_color[1]) ;
+    new_color[2] = (reflection_index * origin_vertex_color[2])
+    + ((1 - reflection_index) * dest_vertex_color[2]) ;
+
+    document.getElementById("Ocolor")
+    .style
+    .fill = 'rgb(' 
+    + origin_vertex_color[0]*100 + ', ' 
+    + origin_vertex_color[1]*100 + ' , ' 
+    + origin_vertex_color[2]*100 + ')';
+
+    document.getElementById("Dcolor")
+    .style
+    .fill = 'rgb(' 
+    + dest_vertex_color[0]*100 + ', ' 
+    + dest_vertex_color[1]*100 + ' , ' 
+    + dest_vertex_color[2]*100 + ')';
+
+    document.getElementById("Ncolor")
+    .style
+    .fill = 'rgb(' 
+    + new_color[0]*100 + ', ' 
+    + new_color[1]*100 + ' , ' 
+    + new_color[2]*100 + ')';
+}
+
+
+// Computes color of a vertex using phong model
+function getColor(object, vertex)
+{
+    var color = vec3();
+
+    var ambientTerm = object.material.kAmbi;
+    
+    var diffuseTerm = object.material.kDiff;
+    
+    var specularTerm = object.material.kSpec;
+
+    var L = vec3();
+    var E = vec3();
+
+    if(scener.light_sources[0].position[3] == 0)
+    {
+        L[0] = scener.light_sources[0].position[0];
+        L[1] = scener.light_sources[0].position[1];
+        L[2] = scener.light_sources[0].position[2];
+        normalize(L);
+    }
+    else
+    {
+        L = subtract([scener.light_sources[0].position[0],
+                    scener.light_sources[0].position[1],
+                    scener.light_sources[0].position[2]]
+                    ,vertex);
+        normalize(L)
+    }
+
+    E = normalized(vertex);
+    E[0] = - E[0];
+    E[1] = - E[1];
+    E[2] = - E[2];
+
+    var H  = vec3();
+    H = add(L,E);
+    normalize(H);
+
+    var N = vec4();
+    N = subtract(vertex, object.center);
+    normalize(N)
+
+    // ambient
+    var ambient = vec4(ambientTerm[0],ambientTerm[1],ambientTerm[2],1);
+    // diffuse
+    var dotProductLN = dotProduct(L,N);
+
+    var cosNL = Math.max(dotProductLN, 0.0);
+    var diffuse = vec4(diffuseTerm[0] * cosNL,
+                    diffuseTerm[1] * cosNL,
+                    diffuseTerm[2] * cosNL,
+                    1.0); 
+    // specular
+    var dotProductNH = dotProduct(N,H);
+    
+    var cosNH = Math.pow(Math.max(dotProductNH, 0.0), object.material.nPhong);
+    var specular = vec4(specularTerm[0] * cosNH,
+                    specularTerm[1] * cosNH,
+                    specularTerm[2] * cosNH,
+                    1.0); 
+
+    if( dotProductLN < 0.0 ) 
+    {
+        specular = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    color[0] = ambient[0] + diffuse[0] + specular[0];
+    color[1] = ambient[1] + diffuse[1] + specular[1];
+    color[2] = ambient[2] + diffuse[2] + specular[2];
+    return color;
+}
 //----------------------------------------------------------------------------
 // WebGL Initialization
 function initWebGL( canvas ) {
@@ -459,18 +569,18 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
 
     let sphere2 = scene.addObject(sphere_model.gl_model);
     sphere2.positionAt(0.55,-0.65,-0.5);
-    sphere2.material.kAmbient(0.21,0.13,0.05);
-    sphere2.material.kDiffuse(0.71,0.43,0.18);    
-    sphere2.material.kSpecular(0.39,0.27,0.17);
-    sphere2.material.nPhongs(25.6);
+    sphere2.material.kAmbient(0.30,0.00,0.00);
+    sphere2.material.kDiffuse(0.60,0.00,0.00);    
+    sphere2.material.kSpecular(0.80,0.60,0.60);
+    sphere2.material.nPhongs(32.0);
     sphere2.scale(0.35,0.35,0.35);
 
     let sphere3 = scene.addObject(sphere_model.gl_model);
     sphere3.positionAt(-0.10,-0.65, 0.05);
-    sphere3.material.kAmbient(0.21,0.13,0.05);
-    sphere3.material.kDiffuse(0.71,0.43,0.18);    
-    sphere3.material.kSpecular(0.39,0.27,0.17);
-    sphere3.material.nPhongs(25.6);
+    sphere3.material.kAmbient(0.00,0.00,0.05);
+    sphere3.material.kDiffuse(0.00,0.00,1.00);    
+    sphere3.material.kSpecular(1.00,1.00,1.00);
+    sphere3.material.nPhongs(125.0);
     sphere3.scale(0.35,0.35,0.35);
 
     return scene;
@@ -498,7 +608,7 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     floor.scale(5,1,5)
 
     let sphere = scene.addObject(sphere_model.gl_model);
-    sphere.positionAt(0.55,-0.65,0.55);
+    sphere.positionAt(0.50,0.40,0.50);
     sphere.material.kAmbient(0.21,0.13,0.05);
     sphere.material.kDiffuse(0.71,0.43,0.18);    
     sphere.material.kSpecular(0.39,0.27,0.17);
@@ -506,7 +616,7 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     sphere.scale(0.35,0.35,0.35);
 
     let sphere2 = scene.addObject(sphere_model.gl_model);
-    sphere2.positionAt(0.55,-0.65,-0.5);
+    sphere2.positionAt(0.50,-0.40,0.50);
     sphere2.material.kAmbient(0.21,0.13,0.05);
     sphere2.material.kDiffuse(0.71,0.43,0.18);    
     sphere2.material.kSpecular(0.39,0.27,0.17);
@@ -514,12 +624,20 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     sphere2.scale(0.35,0.35,0.35);
 
     let sphere3 = scene.addObject(sphere_model.gl_model);
-    sphere3.positionAt(-0.10,-0.65, 0.05);
-    sphere3.material.kAmbient(0.21,0.13,0.05);
-    sphere3.material.kDiffuse(0.71,0.43,0.18);    
-    sphere3.material.kSpecular(0.39,0.27,0.17);
-    sphere3.material.nPhongs(25.6);
+    sphere3.positionAt(-0.50,-0.40, 0.50);
+    sphere3.material.kAmbient(0.00,0.00,0.50);
+    sphere3.material.kDiffuse(0.00,0.00,1.00);    
+    sphere3.material.kSpecular(1.00,1.00,1.00);
+    sphere3.material.nPhongs(125.0);
     sphere3.scale(0.35,0.35,0.35);
+
+    let sphere4 = scene.addObject(sphere_model.gl_model);
+    sphere4.positionAt(-0.50,0.40, 0.50);
+    sphere4.material.kAmbient(0.23,0.23,0.23);
+    sphere4.material.kDiffuse(0.28,0.28,0.28);    
+    sphere4.material.kSpecular(0.77,0.77,0.77);
+    sphere4.material.nPhongs(89.6);
+    sphere4.scale(0.35,0.35,0.35);
 
     return scene;
 }

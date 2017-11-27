@@ -77,6 +77,7 @@
         <script id="shader-fs" type="x-shader/x-fragment">
             precision mediump float;
             varying vec4 vertexColor;
+            varying vec4 reflectedColor;
             void main(void) {
                 // Using the passed vertex color
                 gl_FragColor = vertexColor;
@@ -193,6 +194,17 @@
                             </button>
                             </p>
                             <canvas id="canvasr" style="border:1px solid #000000;" width="350" height="350"></canvas>
+                            <p>
+                             <svg width="110" height="110">
+                              <rect id = "Ocolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            </svg> 
+                            <svg width="110" height="110">
+                              <rect id = "Dcolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            </svg> 
+                            <svg width="110" height="110">
+                              <rect id = "Ncolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            </svg> 
+                            </p>
                         </div>
                     </div>
                 </div>

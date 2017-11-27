@@ -64,6 +64,23 @@ function normalize( v )
         v[2] = v[2] / norm;
 }
 
+function normalized( v )
+{
+    var result = vec3();
+    var squaresSum = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    
+    var norm = Math.sqrt( squaresSum );
+    
+
+        result[0] = result[0] / norm;
+        
+        result[1] = result[1] / norm;
+        
+        result[2] = result[2] / norm;
+
+    return result;
+}
+
 
 //----------------------------------------------------------------------------
 
@@ -137,5 +154,15 @@ function multiplyVectorByMatrix( m, p )
         }
     }
     
+    return result;
+}
+
+//----------------------------------------------------------------------------
+function add(u,v)
+{
+    var result = vec3();
+    result[0] = u[0] + v[0];
+    result[1] = u[1] + v[1];
+    result[2] = u[2] + v[2];
     return result;
 }

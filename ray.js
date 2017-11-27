@@ -2,9 +2,12 @@ class Ray{
 
     constructor(ox, oy, oz, px, py, pz){
         this.origin = [ox, oy, oz];
+        this.dest = [px,py,pz];
         this.dir = [px-ox,py-oy,pz-oz];
         normalize(this.dir)
         this.size = 1;
+        this.origin_object = null;
+        this.dest_object = null;
     }
 
     logRay(){
@@ -12,7 +15,6 @@ class Ray{
     }
 
     drawRay(scene, x,y,z){
-        this.logRay();
         var Ray_Model = Model.getRayModel(this.dir, this.size);
         scene.addModel(Ray_Model)
         scene.initBuffers();
@@ -33,11 +35,9 @@ class Ray{
         C[0] = sphere.tx
         C[1] = sphere.ty
         C[2] = sphere.tz
-//        console.log("C-"+C)
         L[0] = sphere.tx - ray.origin[0]
         L[1] = sphere.ty - ray.origin[1]
         L[2] = sphere.tz - ray.origin[2]
-//        console.log("L-"+L)
 
         tca = dotProduct(L,ray.dir)
 //        console.log("tca-"+tca)
@@ -57,7 +57,6 @@ class Ray{
         intersection[0] = ray.origin[0] + (ray.dir[0]*t0)
         intersection[1] = ray.origin[1] + (ray.dir[1]*t0)
         intersection[2] = ray.origin[2] + (ray.dir[2]*t0)
-        console.log("Returning an intersection - " + intersection)
         return [intersection, C];
         // returns:
         // [vec3(), vec3()]
