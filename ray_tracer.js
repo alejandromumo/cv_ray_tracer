@@ -58,6 +58,7 @@ function tick() {
 //----------------------------------------------------------------------------
 function loadScene3(){
     if(currScene == 3) return;
+    setOutputColors([2.55,2.55,2.55],[2.55,2.55,2.55],[2.55,2.55,2.55]);
     currScene = 3
     currObjectl = scenel3.objects[2]
     currObjectr = scener3.objects[1]
@@ -69,6 +70,7 @@ function loadScene3(){
 
 function loadScene2(){
     if(currScene == 2) return;
+    setOutputColors([2.55,2.55,2.55],[2.55,2.55,2.55],[2.55,2.55,2.55]);
     currScene = 2
     currObjectl = scenel2.objects[2]
     currObjectr = scener2.objects[1]
@@ -80,6 +82,7 @@ function loadScene2(){
 
 function loadScene1(){
     if(currScene == 1) return;
+    setOutputColors([2.55,2.55,2.55],[2.55,2.55,2.55],[2.55,2.55,2.55]);    
     currScene = 1
     currObjectl = null
     currObjectr = null
@@ -337,6 +340,11 @@ function get_first_intersection(ray, pick=false)
 function rayCast(ray, depth)
 {
     var tmp = get_first_intersection(ray);
+    if(tmp == null && depth == 3)
+    {
+        trace_ray(ray.origin, ray.dest);
+    }
+
     if(ray == null || depth == 0 || tmp == null)
     {
         // trace_ray(ray.origin, scener.light_sources[0].position);
@@ -402,6 +410,11 @@ function computeColors(ray)
     new_color[2] = (reflection_index * dest_vertex_color[2])
     + ((1 - reflection_index) * origin_vertex_color[2]) ;
 
+    setOutputColors(origin_vertex_color, dest_vertex_color, new_color);
+}
+
+function setOutputColors(origin_vertex_color, dest_vertex_color, new_color)
+{
     document.getElementById("Ocolor")
     .style
     .fill = 'rgb(' 
@@ -592,18 +605,6 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
         viewVolume.material.nPhongs(25.6);
     }
 
-    // Criação objetos
-    // let cube = scene.addObject(cube_model.gl_model);
-    // cube.positionAt(-0.75, -0.75, -0.75);
-    // cube.material.kAmbient(0.25,0.20,0.07);
-    // cube.material.kDiffuse(0.75,0.60,0.23);
-    // cube.material.kSpecular(0.63,0.56,0.37);
-    // cube.material.nPhongs(51.2);
-
-    // let pyramid = scene.addObject(pyramid_model.gl_model);
-    // pyramid.positionAt( -0.75, 0.5,0);
-    // pyramid.material.kDiffuse(1,0,0);
-
     let floor = scene.addObject(floor_model_tmp.gl_model);
     floor.material.kDiffuse(1,1,1);
 
@@ -748,7 +749,7 @@ function populateRightScene(sr)
     // Add light to right scene
     let light_source = new LightSource();
     light_source.positionAt(0,0,0.5);
-    light_source.type(0); // 1 -> omni , 0 -> directional
+    light_source.type(1); // 1 -> omni , 0 -> directional
     light_source.switchOn();
     sr.addLightSource(light_source);
 
@@ -766,11 +767,33 @@ function populateRightScene(sr)
     return sr
 }
 
+function reset_both_scenes_rays()
+{
+    reset_rays(scenel);
+    setOutputColors([2.55,2.55,2.55],[2.55,2.55,2.55],[2.55,2.55,2.55]);
+}
+
+function disable_frustum()
+{
+    scenel.drawFrustum  = !scenel.drawFrustum;
+}
+
+function reset_rays(scene)
+{
+    for(let I = scene.objects.length - 1 ; I >= 0; I--)
+    {
+        if(scene.objects[I].glmodel.model.name == "ray")
+        {
+            scene.objects.splice(I,1);
+        }
+    }
+}
+
 function populateLeftScene(sl)
 {
     // Add light to left scene
     let light_source = new LightSource();
-    light_source.positionAt(0,0.2,1.30);
+    light_source.positionAt(0,0.2,1);
     light_source.type(0); // 1 -> omni , 0 -> directional
     light_source.switchOn();
     sl.addLightSource(light_source);

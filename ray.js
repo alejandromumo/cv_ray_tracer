@@ -19,6 +19,7 @@ class Ray{
         scene.addModel(Ray_Model)
         scene.initBuffers();
         var ray = scene.addObject(Ray_Model.gl_model)
+        ray.p_Size = 50;
         ray.positionAt(x,y,z);
     }
 

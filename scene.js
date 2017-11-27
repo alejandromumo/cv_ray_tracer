@@ -20,6 +20,8 @@ class Scene{
         this.next_model_index = 0;
         this.model_vertices = [];
         this.normals = [];
+
+        this.drawFrustum = true;
     }
 
     drawScene(projectionType, primitiveType, scener)
@@ -57,7 +59,7 @@ class Scene{
             }
 
             this.computeViewerPosition();
-            myObject.drawObject(primitiveType);
+            myObject.drawObject(primitiveType, this.drawFrustum);
         }
     }
 
@@ -93,7 +95,6 @@ class Scene{
 
         this.model_vertices = this.model_vertices.concat(model.positionArray);
         this.normals = this.normals.concat(model.normalsArray);
-        //this.initBuffers();
 
         this.next_model_index += gl_model.size;
     }

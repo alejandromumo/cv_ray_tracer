@@ -25,6 +25,7 @@
             uniform vec3 diffuseProduct;
             uniform vec3 specularProduct;
             uniform float shininess;
+
             void main(void) {
                 // To allow seeing the points drawn
                 gl_PointSize = 5.0;
@@ -130,14 +131,33 @@
             <div class="demo-container mdl-grid">
                 <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
                 <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
-                    <h3>What is Ray Tracing</h3>
+                    <h3>Ray Tracing</h3>
                     <p>
-                    Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+                    Simple animation that shows rays, reflections and color.
+                    
+                    <br>
+                        Usage:
+                    <br>
+                    Select a mode:
+                    <br>
+                    <b> Object Insert Mode </b> -> select, add and modify spheres.
+                    <br>
+                    <b> Ray Trace Mode </b>  -> select a pixel and check in left scene for the resulting ray and reflections. 
+                    <br>
+                    <b> Select a scene </b> from a pre-built scene and add spheres as you wish.
+                    <br>
+                    <b> Reset button </b> allows you to clear drawn rays.
+                    <br>
+                    <b>Toggle View Volume </b> allows you to disable view volume on left scene.
+                    <br>
+                    <b>Colors circles </b>tells you the ray's reflection origin vertex color, destination vertex color and the resulting color that would be draw.
+                    <br>
+                    When in insert mode, <b> pick a sphere </b>  and use <b> sliders </b>  to modify properties. 
                     </p>
                     <h3 id="demo">Demo</h3>
                     <label for="mode" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
                         <input type="checkbox" id="mode" class="mdl-switch__input" onchange="changeMode()">
-                        <span class="mdl-switch__label">Pick Sphere / Trace Ray</span>
+                        <span class="mdl-switch__label">Object Insert Mode/ Ray Trace Mode</span>
                     </label>
                     <div class="mdl-grid" align="center">
                         <div class="mdl-cell mdl-cell mdl-cell--6-col">
@@ -161,7 +181,7 @@
                                     </span>
                                     <a class="mdl-list__item-secondary-action" href="#">
                                         <button onclick="addSphereToScene();" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-                                            New
+                                            Add Sphere
                                         </button>
                                     </a>
                                 </div>
@@ -180,29 +200,26 @@
                             </div>
                         </div>
                         <div class="mdl-cell mdl-cell mdl-cell--6-col">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                            <button onclick = "reset_both_scenes_rays();"class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
                                 Reset
                             </button>
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
                                 Render
                             </button>
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-                                <i class="material-icons">play_arrow</i>
-                            </button>
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-                                <i class="material-icons">pause</i>
+                            <button onclick = "disable_frustum();"class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                Toggle View Volume
                             </button>
                             </p>
                             <canvas id="canvasr" style="border:1px solid #000000;" width="350" height="350"></canvas>
                             <p>
-                             <svg width="110" height="110">
-                              <rect id = "Ocolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            <svg height="100" width="100">
+                              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" id="Ocolor"/>
                             </svg> 
-                            <svg width="110" height="110">
-                              <rect id = "Dcolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            <svg height="100" width="100">
+                              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" id="Dcolor"/>
                             </svg> 
-                            <svg width="110" height="110">
-                              <rect id = "Ncolor" width="300" height="100" style="fill:rgb(255,255,255);" />
+                            <svg height="100" width="100">
+                              <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" id="Ncolor"/>
                             </svg> 
                             </p>
                         </div>
