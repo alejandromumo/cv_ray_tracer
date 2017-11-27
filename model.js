@@ -3,7 +3,6 @@ class Model{
     {
         this.name = name;
         this.positionArray = positionArray;
-        // this.colorArray = colorArray;
         this.normalsArray = normalsArray;
         this.gl_model = null;
     }

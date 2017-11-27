@@ -40,17 +40,13 @@ class Ray{
         L[2] = sphere.tz - ray.origin[2]
 
         tca = dotProduct(L,ray.dir)
-//        console.log("tca-"+tca)
         if (tca < 0 ) return null
 
         d2 = dotProduct(L,L) - (tca*tca)
         radius2 = Math.pow(sphere.sx,2)
-//        console.log("d2-"+d2)
-//        console.log("radius2-"+radius2)
         if (d2 > radius2 ) return null
 
         thc = Math.sqrt(radius2-d2)
-//        console.log("thc-"+thc)
     
         t0 = tca-thc
 

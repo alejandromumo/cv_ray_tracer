@@ -28,7 +28,7 @@ var triangleVertexNormalBuffer = null;
 var primitiveType = 2;
 
 // To allow choosing the projection type
-var projectionType = 1; // TODO ortogonal não funciona muito bem
+var projectionType = 1;
 
 // Models
 var cube_model = null;
@@ -44,23 +44,6 @@ var sphere_model = null;
 
 // Animation --- Updating transformation parameters
 
-var lastTime = 0;
-
-function animate( scene ) {
-
-    var timeNow = new Date().getTime();
-    if( lastTime != 0 ) {
-        var elapsed = timeNow - lastTime;
-        // do stuff to animate scene
-        // namely rotate objects and stuff
-        //scene.objects[0].deltarotate(1,0,0);
-        //scene.objects[1].deltarotate(2,1,0.3);
-        //scene.objects[4].deltarotate(0,1,0);
-    }
-
-    lastTime = timeNow;
-}
-
 
 //----------------------------------------------------------------------------
 
@@ -68,17 +51,12 @@ function animate( scene ) {
 
 function tick() {
     requestAnimFrame(tick);
-
-    animate( scener );
-    animate( scenel );
-
     scener.drawScene(projectionType, primitiveType, null);
     scenel.drawScene(projectionType, primitiveType, scener);
 }
 
 //----------------------------------------------------------------------------
 function loadScene3(){
-    console.log("Load Scene3")
     if(currScene == 3) return;
     currScene = 3
     currObjectl = scenel3.objects[2]
@@ -90,7 +68,6 @@ function loadScene3(){
 }
 
 function loadScene2(){
-    console.log("Load Scene2")
     if(currScene == 2) return;
     currScene = 2
     currObjectl = scenel2.objects[2]
@@ -102,7 +79,6 @@ function loadScene2(){
 }
 
 function loadScene1(){
-    console.log("Load Scene1")
     if(currScene == 1) return;
     currScene = 1
     currObjectl = null
@@ -129,7 +105,105 @@ function changeMode(){
 }
 
 function addSphereToScene(){
-    console.log("Add Sphere")
+    if(currScene == 1)
+    {
+        var sphere_model_tmp = null;
+        for(let I = 0;I < scener.models.length; I++)
+        {
+            if(scener.models[I].name == "sphere")
+            {
+                sphere_model_tmp = scener.models[I];
+                break;
+            }
+        }
+
+        var spherer = scener.addObject(sphere_model_tmp.gl_model);
+        var spherel = scenel.addObject(sphere_model_tmp.gl_model);
+        spherer.scale(0.35,0.35,0.35);
+        spherel.scale(0.35,0.35,0.35);
+        spherer.positionAt(0,1,0);
+        spherel.positionAt(0,1,0);
+        spherer.material.kAmbient(0.00,0.00,0.05);
+        spherer.material.kDiffuse(0.00,0.00,1.00);    
+        spherer.material.kSpecular(1.00,1.00,1.00);
+        spherer.material.nPhongs(125.0);
+
+        spherel.material.kAmbient(0.00,0.00,0.05);
+        spherel.material.kDiffuse(0.00,0.00,1.00);    
+        spherel.material.kSpecular(1.00,1.00,1.00);
+        spherel.material.nPhongs(125.0);
+
+    }
+    else if(currScene == 2)
+    {
+        var sphere_model_tmp = null;
+        for(let I = 0;I < scener.models.length; I++)
+        {
+            if(scener.models[I].name == "sphere")
+            {
+                sphere_model_tmp = scener.models[I];
+                break;
+            }
+        }
+
+        if(sphere_model_tmp == null)
+        {
+            sphere_model_tmp = Model.getSphereModel();
+            scener.addModel(sphere_model_tmp);
+            scenel.addModel(sphere_model_tmp);
+        }
+
+        var spherer = scener.addObject(sphere_model_tmp.gl_model);
+        var spherel = scenel.addObject(sphere_model_tmp.gl_model);
+        spherer.scale(0.35,0.35,0.35);
+        spherel.scale(0.35,0.35,0.35);
+        spherer.positionAt(0,0,0);
+        spherel.positionAt(0,0,0);
+        spherer.material.kAmbient(0.00,0.00,0.05);
+        spherer.material.kDiffuse(0.00,0.00,1.00);    
+        spherer.material.kSpecular(1.00,1.00,1.00);
+        spherer.material.nPhongs(125.0);
+
+        spherel.material.kAmbient(0.00,0.00,0.05);
+        spherel.material.kDiffuse(0.00,0.00,1.00);    
+        spherel.material.kSpecular(1.00,1.00,1.00);
+        spherel.material.nPhongs(125.0);
+    }
+    else if(currScene == 3)
+    {
+        var sphere_model_tmp = null;
+        for(let I = 0;I < scener.models.length; I++)
+        {
+            if(scener.models[I].name == "sphere")
+            {
+                sphere_model_tmp = scener.models[I];
+                break;
+            }
+        }
+
+        if(sphere_model_tmp == null)
+        {
+            sphere_model_tmp = Model.getSphereModel();
+            scener.addModel(sphere_model_tmp);
+            scenel.addModel(sphere_model_tmp);
+        }
+
+        var spherer = scener.addObject(sphere_model_tmp.gl_model);
+        var spherel = scenel.addObject(sphere_model_tmp.gl_model);
+        spherer.scale(0.35,0.35,0.35);
+        spherel.scale(0.35,0.35,0.35);
+        spherer.positionAt(0,1,0);
+        spherel.positionAt(0,1,0);
+        spherer.material.kAmbient(0.00,0.00,0.05);
+        spherer.material.kDiffuse(0.00,0.00,1.00);    
+        spherer.material.kSpecular(1.00,1.00,1.00);
+        spherer.material.nPhongs(125.0);
+
+        spherel.material.kAmbient(0.00,0.00,0.05);
+        spherel.material.kDiffuse(0.00,0.00,1.00);    
+        spherel.material.kSpecular(1.00,1.00,1.00);
+        spherel.material.nPhongs(125.0);
+    }
 }
 
 function setEventListeners(){
@@ -165,10 +239,8 @@ function setEventListeners(){
                 console.log(scener);
                 console.log("Scene left: ");
                 console.log(scenel);
-                // console.log(scener.camera.viewMatrix)
                 break;
             default:
-                console.log(event.keyCode);
                 break;
         }
     });
@@ -229,7 +301,6 @@ function get_first_intersection(ray, pick=false)
             if( scener.objects[i].glmodel.model.name === "sphere" ){
                 
                 tmp = Ray.testSphereIntersectionSphere(ray, scener.objects[i]);
-                // console.log(point);
                 // The Ray does not intersect this object
                 if (tmp == null ){
                     continue;
@@ -252,11 +323,9 @@ function get_first_intersection(ray, pick=false)
         }
         // No object was intersected
         if (found == false ){
-            console.log("No intersection");
             return null;
         }
         if(pick){
-            console.log("Id-"+objId)
             return objId;
         }
 
@@ -326,12 +395,12 @@ function computeColors(ray)
     var dest_vertex_color = getColor(ray.dest_object, dest_vertex);
     var new_color = vec3();
     var reflection_index = 0.6;
-    new_color[0] = (reflection_index * origin_vertex_color[0])
-    + ((1 - reflection_index) * dest_vertex_color[0]) ;
-    new_color[1] = (reflection_index * origin_vertex_color[1])
-    + ((1 - reflection_index) * dest_vertex_color[1]) ;
-    new_color[2] = (reflection_index * origin_vertex_color[2])
-    + ((1 - reflection_index) * dest_vertex_color[2]) ;
+    new_color[0] = (reflection_index * dest_vertex_color[0])
+    + ((1 - reflection_index) * origin_vertex_color[0]) ;
+    new_color[1] = (reflection_index * dest_vertex_color[1])
+    + ((1 - reflection_index) * origin_vertex_color[1]) ;
+    new_color[2] = (reflection_index * dest_vertex_color[2])
+    + ((1 - reflection_index) * origin_vertex_color[2]) ;
 
     document.getElementById("Ocolor")
     .style
@@ -505,11 +574,13 @@ function initScenes(canvasl, canvasr)
 function initScene3( name , gl , shaderProgram, frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
 
-    scene.addModel(cube_model);
-    scene.addModel(pyramid_model);
-    scene.addModel(floor_model);
-    scene.addModel(bck_model);
-    scene.addModel(sphere_model);
+    var floor_model_tmp = Model.getFloorModel();
+    var bck_model_tmp = Model.getBackgroundModel();
+    var sphere_model_tmp = Model.getSphereModel();
+
+    scene.addModel(floor_model_tmp);
+    scene.addModel(bck_model_tmp);
+    scene.addModel(sphere_model_tmp);
 
     if(frustrum){
         // View Volume representing right scene view volume
@@ -522,28 +593,28 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
     }
 
     // Criação objetos
-    let cube = scene.addObject(cube_model.gl_model);
-    cube.positionAt(-0.75, -0.75, -0.75);
-    cube.material.kAmbient(0.25,0.20,0.07);
-    cube.material.kDiffuse(0.75,0.60,0.23);
-    cube.material.kSpecular(0.63,0.56,0.37);
-    cube.material.nPhongs(51.2);
+    // let cube = scene.addObject(cube_model.gl_model);
+    // cube.positionAt(-0.75, -0.75, -0.75);
+    // cube.material.kAmbient(0.25,0.20,0.07);
+    // cube.material.kDiffuse(0.75,0.60,0.23);
+    // cube.material.kSpecular(0.63,0.56,0.37);
+    // cube.material.nPhongs(51.2);
 
-    let pyramid = scene.addObject(pyramid_model.gl_model);
-    pyramid.positionAt( -0.75, 0.5,0);
-    pyramid.material.kDiffuse(1,0,0);
+    // let pyramid = scene.addObject(pyramid_model.gl_model);
+    // pyramid.positionAt( -0.75, 0.5,0);
+    // pyramid.material.kDiffuse(1,0,0);
 
-    let floor = scene.addObject(floor_model.gl_model);
+    let floor = scene.addObject(floor_model_tmp.gl_model);
     floor.material.kDiffuse(1,1,1);
 
-    let background = scene.addObject(bck_model.gl_model);
+    let background = scene.addObject(bck_model_tmp.gl_model);
     background.material.kAmbient(0.21,0.13,0.05);
     background.material.kDiffuse(0.71,0.43,0.18);
     background.material.kSpecular(0.39,0.27,0.17);
     background.material.nPhongs(25.6);
     background.positionAt(0,0,0);
 
-    let leftwall = scene.addObject(bck_model.gl_model);
+    let leftwall = scene.addObject(bck_model_tmp.gl_model);
     leftwall.material.kAmbient(0.21,0.13,0.05);
     leftwall.material.kDiffuse(0.71,0.43,0.18);
     leftwall.material.kSpecular(0.39,0.27,0.17);
@@ -551,7 +622,7 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
     leftwall.rotate(0,90,0)
     leftwall.positionAt(0,0,0);
 
-    let rightwall = scene.addObject(bck_model.gl_model);
+    let rightwall = scene.addObject(bck_model_tmp.gl_model);
     rightwall.material.kAmbient(0.21,0.13,0.05);
     rightwall.material.kDiffuse(0.71,0.43,0.18);
     rightwall.material.kSpecular(0.39,0.27,0.17);
@@ -559,7 +630,7 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
     rightwall.rotate(0,270,0)
     rightwall.positionAt(0,0,0);
 
-    let sphere = scene.addObject(sphere_model.gl_model);
+    let sphere = scene.addObject(sphere_model_tmp.gl_model);
     sphere.positionAt(0.55,-0.65,0.55);
     sphere.material.kAmbient(0.21,0.13,0.05);
     sphere.material.kDiffuse(0.71,0.43,0.18);    
@@ -567,7 +638,7 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
 
-    let sphere2 = scene.addObject(sphere_model.gl_model);
+    let sphere2 = scene.addObject(sphere_model_tmp.gl_model);
     sphere2.positionAt(0.55,-0.65,-0.5);
     sphere2.material.kAmbient(0.30,0.00,0.00);
     sphere2.material.kDiffuse(0.60,0.00,0.00);    
@@ -575,7 +646,7 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
     sphere2.material.nPhongs(32.0);
     sphere2.scale(0.35,0.35,0.35);
 
-    let sphere3 = scene.addObject(sphere_model.gl_model);
+    let sphere3 = scene.addObject(sphere_model_tmp.gl_model);
     sphere3.positionAt(-0.10,-0.65, 0.05);
     sphere3.material.kAmbient(0.00,0.00,0.05);
     sphere3.material.kDiffuse(0.00,0.00,1.00);    
@@ -589,8 +660,11 @@ function initScene3( name , gl , shaderProgram, frustrum = false){
 function initScene2( name , gl , shaderProgram,  frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
 
-    scene.addModel(floor_model);
-    scene.addModel(sphere_model);
+    var floor_model_tmp = Model.getFloorModel();
+    var sphere_model_tmp = Model.getSphereModel();
+
+    scene.addModel(floor_model_tmp);
+    scene.addModel(sphere_model_tmp);
 
     if(frustrum){
         // View Volume representing right scene view volume
@@ -602,12 +676,12 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
         viewVolume.material.nPhongs(25.6);
     }
 
-    let floor = scene.addObject(floor_model.gl_model);
+    let floor = scene.addObject(floor_model_tmp.gl_model);
     floor.material.kAmbient(0,1,0);    
     floor.material.kDiffuse(1,1,1);
     floor.scale(5,1,5)
 
-    let sphere = scene.addObject(sphere_model.gl_model);
+    let sphere = scene.addObject(sphere_model_tmp.gl_model);
     sphere.positionAt(0.50,0.40,0.50);
     sphere.material.kAmbient(0.21,0.13,0.05);
     sphere.material.kDiffuse(0.71,0.43,0.18);    
@@ -615,7 +689,7 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     sphere.material.nPhongs(25.6);
     sphere.scale(0.35,0.35,0.35);
 
-    let sphere2 = scene.addObject(sphere_model.gl_model);
+    let sphere2 = scene.addObject(sphere_model_tmp.gl_model);
     sphere2.positionAt(0.50,-0.40,0.50);
     sphere2.material.kAmbient(0.21,0.13,0.05);
     sphere2.material.kDiffuse(0.71,0.43,0.18);    
@@ -623,7 +697,7 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     sphere2.material.nPhongs(25.6);
     sphere2.scale(0.35,0.35,0.35);
 
-    let sphere3 = scene.addObject(sphere_model.gl_model);
+    let sphere3 = scene.addObject(sphere_model_tmp.gl_model);
     sphere3.positionAt(-0.50,-0.40, 0.50);
     sphere3.material.kAmbient(0.00,0.00,0.50);
     sphere3.material.kDiffuse(0.00,0.00,1.00);    
@@ -631,7 +705,7 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
     sphere3.material.nPhongs(125.0);
     sphere3.scale(0.35,0.35,0.35);
 
-    let sphere4 = scene.addObject(sphere_model.gl_model);
+    let sphere4 = scene.addObject(sphere_model_tmp.gl_model);
     sphere4.positionAt(-0.50,0.40, 0.50);
     sphere4.material.kAmbient(0.23,0.23,0.23);
     sphere4.material.kDiffuse(0.28,0.28,0.28);    
@@ -645,7 +719,11 @@ function initScene2( name , gl , shaderProgram,  frustrum = false){
 function initScene1( name , gl , shaderProgram, frustrum = false){
     let scene = new Scene(name, gl, shaderProgram);
     
-    scene.addModel(floor_model);
+    var floor_model_tmp = Model.getFloorModel();
+    var sphere_model_tmp = Model.getSphereModel();
+
+    scene.addModel(floor_model_tmp);
+    scene.addModel(sphere_model_tmp);
 
     if(frustrum){
         // View Volume representing right scene view volume
@@ -657,7 +735,7 @@ function initScene1( name , gl , shaderProgram, frustrum = false){
         viewVolume.material.nPhongs(25.6);
     }
 
-    let floor = scene.addObject(floor_model.gl_model);
+    let floor = scene.addObject(floor_model_tmp.gl_model);
     floor.material.kAmbient(0,0,0);    
     floor.material.kDiffuse(1,1,1);
     floor.scale(5,1,5)
