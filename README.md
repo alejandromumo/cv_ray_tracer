@@ -2,7 +2,7 @@
 Literally the best Ray Tracer in town (at the time).
 This project was developed in the Visual Computing lab class. It aims to show the processing steps of a simple ray tracing algorithm in webGL. 
 
-The algorithm will cast a ray for each pixel, compute its reflections and calculate the resulting color of the surfaces that the reflections collided
+The algorithm will cast a ray for each pixel, compute its reflections and calculate the resulting color of the surfaces that the reflections collided (currently it supports one reflection only)
 
 This project describes the algorithm in two ways:
 
