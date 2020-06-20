@@ -237,6 +237,16 @@ function setEventListeners(){
             case 68: // move RIGHT D
                 scenel.camera.deltaRotate(0,-10,0);
                 break;
+            case 107: // zoom in
+                console.log(scenel.camera.toString());
+                scenel.camera.translate(0, -1, 0);
+                console.log("Zoom in");
+                break;
+            case 109: // zoom out
+                console.log(scenel.camera.toString());
+                scenel.camera.translate(0, 1, 0);
+                console.log("Zoom out");
+                break;
             case 13:
                 console.log("Scene right: ");
                 console.log(scener);
@@ -280,7 +290,7 @@ function setEventListeners(){
             currObjectr = scener.objects[id];
             currObjectl = scenel.objects[id+1];
         }else{
-            rayCast(ray,3);
+            rayCast(ray,2);
         }
             }, false);
 }
